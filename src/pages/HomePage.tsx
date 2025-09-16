@@ -1,6 +1,7 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Apple, BarChart3, Calendar, ChefHat, Target, Users } from "lucide-react"
+import { Link } from "react-router-dom"
 
 export default function HomePage() {
   return (
@@ -18,8 +19,12 @@ export default function HomePage() {
             <a href="#contact" className="text-gray-600 hover:text-gray-900">Contato</a>
           </nav>
           <div className="flex items-center space-x-4">
-            <Button variant="ghost">Entrar</Button>
-            <Button>Começar Grátis</Button>
+            <Button variant="ghost" asChild>
+              <Link to="/auth/login">Entrar</Link>
+            </Button>
+            <Button asChild>
+              <Link to="/auth/register">Começar Grátis</Link>
+            </Button>
           </div>
         </div>
       </header>
@@ -36,11 +41,11 @@ export default function HomePage() {
             Planeje refeições, monitore calorias e alcance seus objetivos de saúde.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button size="lg" className="text-lg px-8 py-4">
-              Comece Sua Jornada
+            <Button size="lg" className="text-lg px-8 py-4" asChild>
+              <Link to="/auth/register">Comece Sua Jornada</Link>
             </Button>
-            <Button variant="outline" size="lg" className="text-lg px-8 py-4">
-              Ver Demonstração
+            <Button variant="outline" size="lg" className="text-lg px-8 py-4" asChild>
+              <Link to="/auth/login">Ver Demonstração</Link>
             </Button>
           </div>
         </div>
@@ -145,8 +150,8 @@ export default function HomePage() {
           <p className="text-xl text-green-100 mb-8">
             Junte-se a milhares de pessoas que já mudaram seus hábitos alimentares
           </p>
-          <Button size="lg" variant="secondary" className="text-lg px-8 py-4">
-            Começar Agora - Grátis
+          <Button size="lg" variant="secondary" className="text-lg px-8 py-4" asChild>
+            <Link to="/auth/register">Começar Agora - Grátis</Link>
           </Button>
         </div>
       </section>
