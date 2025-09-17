@@ -84,6 +84,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // Simular registro - em produção, seria uma chamada à API
       await new Promise(resolve => setTimeout(resolve, 1500))
       
+      // Validação básica da senha para evitar warning
+      if (password.length < 6) {
+        throw new Error('Senha deve ter pelo menos 6 caracteres')
+      }
+      
       const mockUser: User = {
         id: Date.now().toString(),
         email: email,

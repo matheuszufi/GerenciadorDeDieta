@@ -1,7 +1,12 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../contexts/AuthContext'
 import './RegisterPage.css'
 
 export default function RegisterPage() {
+  const { register } = useAuth()
+  const navigate = useNavigate()
+  
   // Estados para controlar os dados do formulário
   const [formData, setFormData] = useState({
     name: '',
@@ -31,13 +36,32 @@ export default function RegisterPage() {
     setIsLoading(true)
     setError('')
     
-    // Aqui faremos a validação e envio dos dados
-    console.log('Dados do formulário:', formData)
-    
-    // Simular um delay de envio
-    setTimeout(() => {
+    try {
+      // Validações básicas
+      if (!formData.name.trim()) {
+        throw new Error('Nome é obrigatório')
+      }
+      
+      if (!formData.email.trim()) {
+        throw new Error('Email é obrigatório')
+      }
+      
+      if (formData.password.length < 6) {
+        throw new Error('Senha deve ter pelo menos 6 caracteres')
+      }
+      
+      // Chamar a função de registro do AuthContext
+      await register(formData.name, formData.email, formData.password)
+      
+      // Se chegou aqui, o registro foi bem-sucedido
+      // Redirecionar para o dashboard
+      navigate('/dashboard')
+      
+    } catch (error: any) {
+      setError(error.message || 'Erro ao criar conta. Tente novamente.')
+    } finally {
       setIsLoading(false)
-    }, 2000)
+    }
   }
   return (
     <div className="register-container">
@@ -108,6 +132,10 @@ export default function RegisterPage() {
               {isLoading ? 'Criando conta...' : 'Criar Conta'}
             </button>
           </form>
+          
+          <div className="login-link">
+            <p>Já tem uma conta? <a href="/login">Faça login aqui</a></p>
+          </div>
         </div>
       </div>
     </div>
