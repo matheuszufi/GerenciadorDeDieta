@@ -1,14 +1,22 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
+import { initializeDatabase } from './utils/initializeDatabase'
+import { useEffect } from 'react'
 
 // Pages
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
-import DashboardPage from './pages/DashboardPage'
+import DashboardPage from './pages/DashboardPageCompact'
+import ProfilePage from './pages/ProfilePage'
 
 function App() {
+  useEffect(() => {
+    // Inicializar banco de dados com alimentos padrão
+    initializeDatabase()
+  }, [])
+
   return (
     <AuthProvider>
       <BrowserRouter>
@@ -24,6 +32,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
               </ProtectedRoute>
             } 
           />

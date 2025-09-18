@@ -85,7 +85,7 @@ export default function ForgotPasswordPage() {
               </Button>
               
               <Link
-                to="/auth/login"
+                to="/login"
                 className="text-center text-sm text-green-600 hover:text-green-500 font-medium"
               >
                 Voltar ao login
@@ -155,7 +155,7 @@ export default function ForgotPasswordPage() {
               </Button>
 
               <Link
-                to="/auth/login"
+                to="/login"
                 className="flex items-center justify-center text-sm text-gray-600 hover:text-gray-900"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />

@@ -19,7 +19,7 @@ export function PrivateRoute({ children }: PrivateRouteProps) {
   }
 
   if (!user) {
-    return <Navigate to="/auth/login" replace />
+    return <Navigate to="/login" replace />
   }
 
   return <>{children}</>

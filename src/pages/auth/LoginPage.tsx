@@ -124,9 +124,10 @@ export default function LoginPage() {
           </div>
           
           <div className="demo-credentials">
-            <p><strong>Credenciais de demonstração:</strong></p>
+            <p><strong>🔧 Credenciais para teste:</strong></p>
             <p>Email: admin@nutriplan.com</p>
             <p>Senha: 123456</p>
+            <p><small>* Funciona mesmo se Firebase não estiver configurado</small></p>
           </div>
         </div>
       </div>

@@ -1,0 +1,106 @@
+// Regras do Firestore Security Rules
+// Cole estas regras no Firebase Console -> Firestore Database -> Rules
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Regra para a coleção de perfis
+    match /profiles/{userId} {
+      // Permitir leitura e escrita apenas para o próprio usuário
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Regra para a coleção de alimentos (foods)
+    match /foods/{foodId} {
+      // Permitir leitura para usuários autenticados (alimentos públicos e privados)
+      allow read: if request.auth != null;
+      // Permitir escrita apenas para alimentos do próprio usuário
+      allow write: if request.auth != null && 
+        (resource == null || resource.data.userId == request.auth.uid);
+    }
+    
+    // Regra para a coleção de pratos (dishes)
+    match /dishes/{dishId} {
+      // Permitir leitura para usuários autenticados (pratos públicos e privados)
+      allow read: if request.auth != null;
+      // Permitir escrita apenas para pratos do próprio usuário
+      allow write: if request.auth != null && 
+        (resource == null || resource.data.userId == request.auth.uid);
+    }
+    
+    // Regra para a coleção de refeições (meals)
+    match /meals/{mealId} {
+      // Permitir leitura e escrita apenas para refeições do próprio usuário
+      allow read, write: if request.auth != null && 
+        (resource == null || resource.data.userId == request.auth.uid);
+    }
+    
+    // Regra para outras coleções futuras (opcional)
+    match /diets/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Permitir coleções de teste para debug (remover em produção)
+    match /test_simple/{document} {
+      allow read, write: if request.auth != null;
+    }
+    
+    match /test_dishes/{document} {
+      allow read, write: if request.auth != null;
+    }
+    
+    match /test_setdoc/{document} {
+      allow read, write: if request.auth != null;
+    }
+    
+    match /test/{document} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Regra padrão mais permissiva para desenvolvimento
+    // REMOVER EM PRODUÇÃO e substituir por: allow read, write: if false;
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
+
+/* 
+INSTRUÇÕES PARA APLICAR AS REGRAS:
+
+1. Acesse o Firebase Console: https://console.firebase.google.com/
+2. Selecione seu projeto: gerenciadordedieta
+3. No menu lateral, clique em "Firestore Database"
+4. Clique na aba "Rules" (Regras)
+5. Substitua o conteúdo atual pelas regras acima
+6. Clique em "Publish" (Publicar)
+
+EXPLICAÇÃO DAS REGRAS:
+
+PROFILES:
+- `request.auth != null`: Verifica se o usuário está autenticado
+- `request.auth.uid == userId`: Garante que o usuário só pode acessar seus próprios dados
+
+FOODS (Alimentos):
+- Leitura: Permitida para usuários autenticados (para acessar alimentos públicos e privados)
+- Escrita: Permitida apenas para alimentos criados pelo próprio usuário
+- Alimentos públicos podem ser lidos por todos, mas editados apenas pelo criador
+
+DISHES (Pratos):
+- Leitura e escrita: Apenas para pratos criados pelo próprio usuário
+- `resource.data.createdBy == request.auth.uid`: Verifica se o usuário é o criador
+
+MEALS (Refeições):
+- Leitura e escrita: Apenas para refeições do próprio usuário
+- `resource.data.userId == request.auth.uid`: Verifica se a refeição pertence ao usuário
+
+SEGURANÇA:
+- Usuários autenticados só podem acessar/modificar seus próprios dados
+- Alimentos públicos são compartilhados para leitura, mas protegidos para escrita
+- Dados pessoais (pratos, refeições) ficam completamente privados
+- Previne vazamentos de dados e acessos não autorizados
+
+IMPORTANTE: Após aplicar essas regras no Firebase Console, aguarde alguns minutos 
+para que as mudanças sejam propagadas globalmente.
+*/

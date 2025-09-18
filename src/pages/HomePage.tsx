@@ -20,10 +20,10 @@ export default function HomePage() {
           </nav>
           <div className="flex items-center space-x-4">
             <Button variant="ghost" asChild>
-              <Link to="/auth/login">Entrar</Link>
+              <Link to="/login">Entrar</Link>
             </Button>
             <Button asChild>
-              <Link to="/auth/register">Começar Grátis</Link>
+              <Link to="/register">Começar Grátis</Link>
             </Button>
           </div>
         </div>
@@ -42,10 +42,10 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button size="lg" className="text-lg px-8 py-4" asChild>
-              <Link to="/auth/register">Comece Sua Jornada</Link>
+              <Link to="/register">Comece Sua Jornada</Link>
             </Button>
             <Button variant="outline" size="lg" className="text-lg px-8 py-4" asChild>
-              <Link to="/auth/login">Ver Demonstração</Link>
+              <Link to="/login">Ver Demonstração</Link>
             </Button>
           </div>
         </div>
@@ -151,7 +151,7 @@ export default function HomePage() {
             Junte-se a milhares de pessoas que já mudaram seus hábitos alimentares
           </p>
           <Button size="lg" variant="secondary" className="text-lg px-8 py-4" asChild>
-            <Link to="/auth/register">Começar Agora - Grátis</Link>
+            <Link to="/register">Começar Agora - Grátis</Link>
           </Button>
         </div>
       </section>
