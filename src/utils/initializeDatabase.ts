@@ -1,6 +1,6 @@
 import { collection, addDoc, getDocs, query, where, deleteDoc } from 'firebase/firestore'
 import { db } from '../lib/firebase'
-import type { Food, FoodUnit } from '../hooks/useFoods'
+import type { Food } from '../hooks/useFoods'
 
 // Unidades comuns para diferentes tipos de alimentos
 const COMMON_UNITS = {

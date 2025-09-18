@@ -8,7 +8,7 @@ import { useEffect } from 'react'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
-import DashboardPage from './pages/DashboardPageCompact'
+import DashboardPage from './pages/DashboardPage'
 import ProfilePage from './pages/ProfilePage'
 
 function App() {

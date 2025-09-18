@@ -2,15 +2,30 @@ import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { useProfile } from '../hooks/useProfile'
 import { useMeals } from '../hooks/useMeals'
-import FirestoreTest from '../components/FirestoreTest'
+import { useState } from 'react'
+import HistoryModal from '../components/HistoryModal'
+import MacroProgress from '../components/MacroProgress'
+import CircularProgress from '../components/CircularProgress'
+import MealEditor from '../components/MealEditor'
+import AddIngredientModal from '../components/AddIngredientModal'
+import type { Meal } from '../hooks/useMeals'
 import './DashboardPage.css'
 
 export default function DashboardPage() {
-  const { user, logout } = useAuth()
+  const { logout } = useAuth()
   const navigate = useNavigate()
-  const { profile, isLoading, tmb, get, dailyGoal, macroGoals, hasCompleteProfile } = useProfile()
-  const { dailyMeals, calculateProgress } = useMeals()
+  const { isLoading, tmb, get, dailyGoal, macroGoals, hasCompleteProfile } = useProfile()
+  const { dailyMeals, calculateProgress, removeMeal } = useMeals()
+  
+  // Estados
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false)
+  const [isMealEditorOpen, setIsMealEditorOpen] = useState(false)
+  const [editingMeal, setEditingMeal] = useState<Meal | null>(null)
+  const [selectedMealType, setSelectedMealType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>('breakfast')
+  const [showFabMenu, setShowFabMenu] = useState(false)
+  const [isAddIngredientModalOpen, setIsAddIngredientModalOpen] = useState(false)
 
+  // Handlers
   const handleLogout = async () => {
     try {
       await logout()
@@ -20,349 +35,368 @@ export default function DashboardPage() {
     }
   }
 
-  const handleProfile = () => {
-    navigate('/profile')
+  const openMealEditor = (type: 'breakfast' | 'lunch' | 'dinner' | 'snack', meal?: Meal) => {
+    setEditingMeal(meal || null)
+    setSelectedMealType(type)
+    setIsMealEditorOpen(true)
+    setShowFabMenu(false) // Fechar menu flutuante ao abrir editor
   }
 
-  const handleQuickAction = (action: string) => {
-    switch (action) {
-      case 'add-meal':
-        // Futura página de registrar refeição
-        alert('Funcionalidade em desenvolvimento: Registrar Refeição')
-        break
-      case 'history':
-        // Futura página de histórico
-        alert('Funcionalidade em desenvolvimento: Ver Histórico')
-        break
-      case 'water':
-        // Futura funcionalidade de água
-        alert('Funcionalidade em desenvolvimento: Registrar Água')
-        break
-      case 'recipes':
-        // Futura funcionalidade de receitas
-        alert('Funcionalidade em desenvolvimento: Receitas')
-        break
-      default:
-        break
+  const toggleFabMenu = () => {
+    setShowFabMenu(!showFabMenu)
+  }
+
+  const handleDeleteMeal = async (mealId: string, mealName: string) => {
+    if (window.confirm(`Tem certeza que deseja excluir a refeição "${mealName}"?`)) {
+      try {
+        await removeMeal(mealId)
+      } catch (error) {
+        console.error('Erro ao excluir refeição:', error)
+        alert('Erro ao excluir refeição')
+      }
     }
   }
 
-  return (
-    <div className="dashboard-container">
-      <header className="dashboard-header">
-        <div className="header-content">
-          <h1 className="dashboard-title">NutriPlan Dashboard</h1>
-          <div className="user-info">
-            <button onClick={handleProfile} className="profile-button">
-              👤 Perfil
+  // Estados de loading e perfil incompleto
+  if (isLoading) {
+    return (
+      <div className="dashboard-container">
+        <div className="loading-state">
+          <div className="loading-spinner"></div>
+          <p>Carregando dados...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!hasCompleteProfile) {
+    return (
+      <div className="dashboard-container">
+        <div className="incomplete-profile">
+          <div className="welcome-card">
+            <h2>👋 Bem-vindo ao NutriPlan!</h2>
+            <p>Complete seu perfil para acessar o dashboard completo.</p>
+            <button onClick={() => navigate('/profile')} className="complete-profile-btn">
+              Completar Perfil
             </button>
-            <span className="welcome-text">Olá, {user?.name}!</span>
-            <button onClick={handleLogout} className="logout-button">
-              Sair
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Dados para MacroProgress
+  const macroData = macroGoals ? {
+    protein: {
+      consumed: dailyMeals?.dailyTotals.protein || 0,
+      target: macroGoals.protein,
+      calories: (dailyMeals?.dailyTotals.protein || 0) * 4,
+      unit: 'g',
+      color: '#10b981',
+      label: 'Proteínas'
+    },
+    carbs: {
+      consumed: dailyMeals?.dailyTotals.carbs || 0,
+      target: macroGoals.carbs,
+      calories: (dailyMeals?.dailyTotals.carbs || 0) * 4,
+      unit: 'g',
+      color: '#10b981',
+      label: 'Carboidratos'
+    },
+    fat: {
+      consumed: dailyMeals?.dailyTotals.fat || 0,
+      target: macroGoals.fat,
+      calories: (dailyMeals?.dailyTotals.fat || 0) * 9,
+      unit: 'g',
+      color: '#10b981',
+      label: 'Gorduras'
+    },
+    fiber: {
+      consumed: dailyMeals?.dailyTotals.fiber || 0,
+      target: 25, // Meta recomendada de fibra
+      unit: 'g',
+      color: '#10b981',
+      label: 'Fibras'
+    },
+    sugar: {
+      consumed: dailyMeals?.dailyTotals.sugar || 0,
+      target: 50, // Meta máxima recomendada de açúcar
+      unit: 'g',
+      color: '#10b981',
+      label: 'Açúcar'
+    },
+    sodium: {
+      consumed: dailyMeals?.dailyTotals.sodium || 0,
+      target: 2300, // Meta máxima recomendada de sódio (mg)
+      unit: 'mg',
+      color: '#10b981',
+      label: 'Sódio'
+    },
+    calories: {
+      consumed: dailyMeals?.dailyTotals.calories || 0,
+      target: dailyGoal || 2000
+    }
+  } : null
+
+  return (
+    <div className="dashboard-container compact">
+      {/* Header Compacto */}
+      <header className="dashboard-header compact">
+        <div className="header-content">
+          <div className="header-left">
+            <h1 className="dashboard-title">NutriPlan</h1>
+            <div className="quick-stats">
+              <span className="stat">
+                {Math.round(dailyMeals?.dailyTotals.calories || 0)}/{dailyGoal} kcal
+              </span>
+              <span className="stat-progress">
+                {Math.round(calculateProgress(dailyGoal || 2000))}%
+              </span>
+            </div>
+          </div>
+          <div className="header-actions">
+            <button onClick={() => setIsAddIngredientModalOpen(true)} className="icon-btn ingredient-btn" title="Criar Ingrediente">
+              🥗
+            </button>
+            <button onClick={() => setIsHistoryModalOpen(true)} className="icon-btn" title="Histórico">
+              📊
+            </button>
+            <button onClick={() => navigate('/profile')} className="icon-btn" title="Perfil">
+              👤
+            </button>
+            <button onClick={handleLogout} className="icon-btn logout" title="Sair">
+              🚪
             </button>
           </div>
         </div>
       </header>
 
-      <main className="dashboard-main">
-        {isLoading ? (
-          <div className="loading-state">
-            <p>Carregando dados...</p>
-          </div>
-        ) : !hasCompleteProfile ? (
-          <div className="incomplete-profile">
-            <div className="welcome-section">
-              <h2>👋 Bem-vindo ao NutriPlan!</h2>
-              <p>Para começar, complete seu perfil para calcularmos suas metas diárias.</p>
-              <button onClick={handleProfile} className="complete-profile-btn">
-                Completar Perfil
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="dashboard-content">
-            {/* Seção de Metas Diárias */}
-            <div className="daily-goals-section">
-              <h2>📊 Metas de Hoje</h2>
-              
-              {/* Meta Principal de Calorias */}
-              <div className="primary-goal">
-                <div className="goal-card primary">
-                  <div className="goal-header">
-                    <h3>Meta Calórica Diária</h3>
-                    <span className="goal-icon">🎯</span>
-                  </div>
-                  <div className="goal-progress">
-                    <div className="progress-numbers">
-                      <span className="consumed">{dailyMeals?.dailyTotals.calories || 0}</span>
-                      <span className="separator">/</span>
-                      <span className="target">{dailyGoal}</span>
-                      <span className="unit">kcal</span>
-                    </div>
-                    <div className="progress-bar">
-                      <div 
-                        className="progress-fill" 
-                        style={{ width: `${dailyGoal ? calculateProgress(dailyGoal) : 0}%` }}
-                      ></div>
-                    </div>
-                    <div className="progress-info">
-                      <span className="remaining">
-                        Restam: {dailyGoal ? Math.max(0, dailyGoal - (dailyMeals?.dailyTotals.calories || 0)) : 0} kcal
-                      </span>
-                      <span className="percentage">
-                        {dailyGoal ? Math.round(calculateProgress(dailyGoal)) : 0}%
-                      </span>
-                    </div>
-                  </div>
+      <main className="dashboard-main compact">
+        <div className="dashboard-grid">
+          {/* Seção de Progresso Principal */}
+          <section className="progress-section">
+            <div className="calories-overview">
+              <h3>Calorias</h3>
+              <CircularProgress
+                value={dailyMeals?.dailyTotals.calories || 0}
+                max={dailyGoal || 2000}
+                size={120}
+                strokeWidth={8}
+                gradient={true}
+                animated={true}
+              />
+              <div className="calories-info">
+                <div className="calories-percentage">
+                  {Math.round(calculateProgress(dailyGoal || 2000))}% da meta
                 </div>
-              </div>
-
-              {/* Macronutrientes */}
-              {macroGoals && (
-                <div className="macros-section">
-                  <h3>🥗 Macronutrientes</h3>
-                  <div className="macros-grid">
-                    {/* Proteínas */}
-                    <div className="macro-card protein">
-                      <div className="macro-header">
-                        <span className="macro-icon">🥩</span>
-                        <h4>Proteínas</h4>
-                      </div>
-                      <div className="macro-progress">
-                        <div className="macro-numbers">
-                          <span className="consumed">{dailyMeals?.dailyTotals.protein || 0}</span>
-                          <span className="separator">/</span>
-                          <span className="target">{macroGoals.protein}</span>
-                          <span className="unit">g</span>
-                        </div>
-                        <div className="progress-bar">
-                          <div 
-                            className="progress-fill protein-fill" 
-                            style={{ width: `${Math.min(((dailyMeals?.dailyTotals.protein || 0) / macroGoals.protein) * 100, 100)}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Carboidratos */}
-                    <div className="macro-card carbs">
-                      <div className="macro-header">
-                        <span className="macro-icon">🍞</span>
-                        <h4>Carboidratos</h4>
-                      </div>
-                      <div className="macro-progress">
-                        <div className="macro-numbers">
-                          <span className="consumed">{dailyMeals?.dailyTotals.carbs || 0}</span>
-                          <span className="separator">/</span>
-                          <span className="target">{macroGoals.carbs}</span>
-                          <span className="unit">g</span>
-                        </div>
-                        <div className="progress-bar">
-                          <div 
-                            className="progress-fill carbs-fill" 
-                            style={{ width: `${Math.min(((dailyMeals?.dailyTotals.carbs || 0) / macroGoals.carbs) * 100, 100)}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Gorduras */}
-                    <div className="macro-card fat">
-                      <div className="macro-header">
-                        <span className="macro-icon">🥑</span>
-                        <h4>Gorduras</h4>
-                      </div>
-                      <div className="macro-progress">
-                        <div className="macro-numbers">
-                          <span className="consumed">{dailyMeals?.dailyTotals.fat || 0}</span>
-                          <span className="separator">/</span>
-                          <span className="target">{macroGoals.fat}</span>
-                          <span className="unit">g</span>
-                        </div>
-                        <div className="progress-bar">
-                          <div 
-                            className="progress-fill fat-fill" 
-                            style={{ width: `${Math.min(((dailyMeals?.dailyTotals.fat || 0) / macroGoals.fat) * 100, 100)}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Fibras */}
-                    <div className="macro-card fiber">
-                      <div className="macro-header">
-                        <span className="macro-icon">🌾</span>
-                        <h4>Fibras</h4>
-                      </div>
-                      <div className="macro-progress">
-                        <div className="macro-numbers">
-                          <span className="consumed">{dailyMeals?.dailyTotals.fiber || 0}</span>
-                          <span className="separator">/</span>
-                          <span className="target">{macroGoals.fiber}</span>
-                          <span className="unit">g</span>
-                        </div>
-                        <div className="progress-bar">
-                          <div 
-                            className="progress-fill fiber-fill" 
-                            style={{ width: `${Math.min(((dailyMeals?.dailyTotals.fiber || 0) / macroGoals.fiber) * 100, 100)}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Micronutrientes */}
-                  <div className="micros-section">
-                    <h4>📋 Controle Adicional</h4>
-                    <div className="micros-grid">
-                      <div className="micro-item">
-                        <span className="micro-icon">🧂</span>
-                        <div className="micro-info">
-                          <span className="micro-name">Sódio</span>
-                          <span className="micro-value">
-                            {dailyMeals?.dailyTotals.sodium || 0} / {macroGoals.sodium} mg
-                          </span>
-                          <div className="micro-bar">
-                            <div 
-                              className="micro-fill sodium-fill"
-                              style={{ width: `${Math.min(((dailyMeals?.dailyTotals.sodium || 0) / macroGoals.sodium) * 100, 100)}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="micro-item">
-                        <span className="micro-icon">🍯</span>
-                        <div className="micro-info">
-                          <span className="micro-name">Açúcar</span>
-                          <span className="micro-value">
-                            {dailyMeals?.dailyTotals.sugar || 0} / {macroGoals.sugar} g
-                          </span>
-                          <div className="micro-bar">
-                            <div 
-                              className="micro-fill sugar-fill"
-                              style={{ width: `${Math.min(((dailyMeals?.dailyTotals.sugar || 0) / macroGoals.sugar) * 100, 100)}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Dados Metabólicos */}
-              <div className="metabolic-data">
-                <h3>⚡ Dados Metabólicos</h3>
-                <div className="metabolic-grid">
-                  <div className="metabolic-item">
-                    <h4>TMB</h4>
-                    <div className="metabolic-value">
-                      <span className="number">{tmb}</span>
-                      <span className="unit">kcal</span>
-                    </div>
-                    <p className="metabolic-desc">Taxa Metabólica Basal</p>
-                  </div>
-
-                  <div className="metabolic-item">
-                    <h4>GET</h4>
-                    <div className="metabolic-value">
-                      <span className="number">{get}</span>
-                      <span className="unit">kcal</span>
-                    </div>
-                    <p className="metabolic-desc">Gasto Energético Total</p>
-                  </div>
-
-                  <div className="metabolic-item">
-                    <h4>Objetivo</h4>
-                    <div className="goal-type">
-                      {profile?.goal === 'lose' && '📉 Perder Peso'}
-                      {profile?.goal === 'maintain' && '⚖️ Manter Peso'}
-                      {profile?.goal === 'gain' && '📈 Ganhar Peso'}
-                      {profile?.goal === 'muscle' && '💪 Ganhar Massa'}
-                    </div>
-                  </div>
+                <div className="calories-remaining">
+                  {Math.max(0, (dailyGoal || 2000) - (dailyMeals?.dailyTotals.calories || 0))} restantes
                 </div>
               </div>
             </div>
 
-            {/* Seção de Ações Rápidas */}
-            <div className="quick-actions-section">
-              <h2>⚡ Ações Rápidas</h2>
-              <div className="quick-actions-grid">
-                <button 
-                  className="quick-action-btn primary"
-                  onClick={() => handleQuickAction('add-meal')}
-                >
-                  <span className="action-icon">🍽️</span>
-                  <span className="action-text">Adicionar Refeição</span>
-                </button>
+            {/* Metas Metabólicas Compactas */}
+            <div className="metabolic-summary">
+              <div className="meta-item">
+                <span className="meta-label">TMB</span>
+                <span className="meta-value">{tmb}</span>
+              </div>
+              <div className="meta-item">
+                <span className="meta-label">GET</span>
+                <span className="meta-value">{get}</span>
+              </div>
+              <div className="meta-item">
+                <span className="meta-label">Meta</span>
+                <span className="meta-value">{dailyGoal}</span>
+              </div>
+            </div>
+          </section>
 
-                <button 
-                  className="quick-action-btn"
-                  onClick={() => handleQuickAction('water')}
-                >
-                  <span className="action-icon">💧</span>
-                  <span className="action-text">Registrar Água</span>
-                </button>
+          {/* Seção de Macronutrientes */}
+          {macroData && (
+            <section className="macros-section">
+              <h3>Macronutrientes</h3>
+              <MacroProgress 
+                protein={macroData.protein}
+                carbs={macroData.carbs}
+                fat={macroData.fat}
+                fiber={macroData.fiber}
+                sugar={macroData.sugar}
+                sodium={macroData.sodium}
+                calories={{ consumed: 0, target: 1 }} // Valores dummy para não mostrar calorias
+                compact={true} 
+              />
+            </section>
+          )}
 
+          {/* Seção de Refeições Compacta */}
+          <section className="meals-section">
+            <div className="meals-header">
+              <h3>Refeições de Hoje</h3>
+              <div className="meal-actions">
                 <button 
-                  className="quick-action-btn"
-                  onClick={() => handleQuickAction('history')}
+                  onClick={() => openMealEditor('breakfast')} 
+                  className="primary-add-btn"
+                  title="Adicionar Nova Refeição"
                 >
-                  <span className="action-icon">�</span>
-                  <span className="action-text">Ver Histórico</span>
-                </button>
-
-                <button 
-                  className="quick-action-btn"
-                  onClick={() => handleQuickAction('recipes')}
-                >
-                  <span className="action-icon">📝</span>
-                  <span className="action-text">Receitas</span>
+                  + Adicionar Refeição
                 </button>
               </div>
             </div>
 
-            {/* Seção de Refeições de Hoje */}
-            <div className="todays-meals-section">
-              <h2>🍽️ Refeições de Hoje</h2>
+            <div className="meals-list compact">
               {dailyMeals && dailyMeals.meals.length > 0 ? (
-                <div className="meals-list">
-                  {dailyMeals.meals.map((meal) => (
-                    <div key={meal.id} className="meal-card">
-                      <div className="meal-header">
+                dailyMeals.meals.map((meal) => (
+                  <div key={meal.id} className="meal-card compact">
+                    <div className="meal-header">
+                      <span className="meal-icon">
+                        {meal.type === 'breakfast' && '☀️'}
+                        {meal.type === 'lunch' && '🌅'}
+                        {meal.type === 'dinner' && '🌙'}
+                        {meal.type === 'snack' && '🍪'}
+                      </span>
+                      <div className="meal-info">
                         <h4>{meal.name}</h4>
-                        <span className="meal-calories">{meal.totals.calories} kcal</span>
+                        <span className="meal-items-count">{meal.items.length} itens</span>
                       </div>
-                      <div className="meal-items">
-                        {meal.items.map((item) => (
-                          <span key={item.id} className="meal-item">
-                            {item.foodName} ({item.quantity}g)
-                          </span>
-                        ))}
+                      <div className="meal-nutrition">
+                        <span className="calories">{Math.round(meal.totals.calories)} kcal</span>
+                        <div className="macros">
+                          <span>P: {Math.round(meal.totals.protein)}g</span>
+                          <span>C: {Math.round(meal.totals.carbs)}g</span>
+                          <span>G: {Math.round(meal.totals.fat)}g</span>
+                        </div>
+                      </div>
+                      <div className="meal-actions">
+                        <button 
+                          onClick={() => openMealEditor(meal.type, meal)}
+                          className="edit-btn"
+                          title="Editar refeição"
+                        >
+                          ✏️
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteMeal(meal.id, meal.name)}
+                          className="delete-btn"
+                          title="Excluir refeição"
+                        >
+                          🗑️
+                        </button>
                       </div>
                     </div>
-                  ))}
-                </div>
+                    
+                    {/* Lista de itens da refeição */}
+                    <div className="meal-items">
+                      {meal.items.map((item, index) => (
+                        <div key={item.id || index} className="meal-item">
+                          <span className="item-name">{item.foodName}</span>
+                          <span className="item-quantity">{item.quantity}g</span>
+                          <span className="item-calories">{Math.round(item.calories)}kcal</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))
               ) : (
-                <div className="empty-meals">
-                  <p>Nenhuma refeição registrada hoje.</p>
-                  <button 
-                    className="add-first-meal-btn"
-                    onClick={() => handleQuickAction('add-meal')}
-                  >
-                    Adicionar primeira refeição
-                  </button>
+                <div className="empty-meals compact">
+                  <p>Nenhuma refeição registrada hoje</p>
+                  <div className="empty-actions">
+                    <button onClick={() => openMealEditor('breakfast')} className="add-meal-btn breakfast">
+                      ☀️ Café
+                    </button>
+                    <button onClick={() => openMealEditor('lunch')} className="add-meal-btn lunch">
+                      🌅 Almoço
+                    </button>
+                    <button onClick={() => openMealEditor('dinner')} className="add-meal-btn dinner">
+                      🌙 Jantar
+                    </button>
+                    <button onClick={() => openMealEditor('snack')} className="add-meal-btn snack">
+                      🍪 Lanche
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
+          </section>
+
+          {/* Seção de Progresso da Água */}
+          <section className="water-section">
+            <h3>Hidratação</h3>
+            <div className="water-progress">
+              <CircularProgress
+                value={dailyMeals?.dailyTotals.water || 0}
+                max={2000} // Meta recomendada de 2L de água por dia
+                size={100}
+                strokeWidth={8}
+                gradient={true}
+                animated={true}
+                label="Água"
+                unit="ml"
+              />
+              <div className="water-info">
+                <div className="water-percentage">
+                  {Math.round(((dailyMeals?.dailyTotals.water || 0) / 2000) * 100)}% da meta
+                </div>
+                <div className="water-remaining">
+                  {Math.max(0, 2000 - (dailyMeals?.dailyTotals.water || 0))}ml restantes
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      {/* Botão Flutuante para Adicionar Refeição */}
+      <div className={`floating-add-container ${showFabMenu ? 'menu-open' : ''}`}>
+        {/* Menu de Opções */}
+        {showFabMenu && (
+          <div className="fab-menu">
+            <button onClick={() => openMealEditor('breakfast')} className="fab-option breakfast">
+              <span>☀️</span>
+              <span>Café</span>
+            </button>
+            <button onClick={() => openMealEditor('lunch')} className="fab-option lunch">
+              <span>🌅</span>
+              <span>Almoço</span>
+            </button>
+            <button onClick={() => openMealEditor('dinner')} className="fab-option dinner">
+              <span>🌙</span>
+              <span>Jantar</span>
+            </button>
+            <button onClick={() => openMealEditor('snack')} className="fab-option snack">
+              <span>🍪</span>
+              <span>Lanche</span>
+            </button>
           </div>
         )}
-      </main>
+        
+        {/* Botão Principal */}
+        <button 
+          onClick={toggleFabMenu}
+          className={`floating-add-btn ${showFabMenu ? 'active' : ''}`}
+          title="Adicionar Refeição"
+        >
+          <span className={`plus-icon ${showFabMenu ? 'rotated' : ''}`}>+</span>
+        </button>
+      </div>
+
+      {/* Modals */}
+      <HistoryModal 
+        isOpen={isHistoryModalOpen}
+        onClose={() => setIsHistoryModalOpen(false)}
+      />
       
-      {/* Componente de teste temporário para debug */}
-      <FirestoreTest />
+      <MealEditor
+        isOpen={isMealEditorOpen}
+        onClose={() => setIsMealEditorOpen(false)}
+        mealType={selectedMealType}
+        existingMeal={editingMeal}
+      />
+
+      <AddIngredientModal
+        isOpen={isAddIngredientModalOpen}
+        onClose={() => setIsAddIngredientModalOpen(false)}
+      />
     </div>
   )
 }

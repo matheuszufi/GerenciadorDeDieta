@@ -25,8 +25,8 @@ export interface Food {
   name: string
   brand?: string
   category: 'protein' | 'carbs' | 'vegetables' | 'fruits' | 'dairy' | 'grains' | 'fats' | 'beverages' | 'others'
-  nutrition: NutritionalValues // por 100g/ml do peso base
-  baseUnit: 'g' | 'ml' // unidade base para os valores nutricionais
+  nutrition: NutritionalValues // por 100g/ml/unidade do peso base
+  baseUnit: 'g' | 'ml' | 'unid' | 'fatia' | 'porcao' // unidade base para os valores nutricionais
   availableUnits: FoodUnit[] // unidades disponíveis para este alimento
   defaultUnit: string // unidade padrão para exibição
   isCustom: boolean // se foi criado pelo usuário

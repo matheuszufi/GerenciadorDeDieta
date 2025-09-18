@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { db } from '../lib/firebase'
 import { doc, setDoc, getDoc } from 'firebase/firestore'
+import { getBrazilianDateString } from '../utils/timezone'
 
 export interface Food {
   id: string
@@ -19,7 +20,8 @@ export interface MealItem {
   id: string
   foodId: string
   foodName: string
-  quantity: number // em gramas
+  quantity: number // em gramas ou na unidade especificada
+  unit?: string // unidade da quantidade (opcional para compatibilidade)
   calories: number
   protein: number
   carbs: number
@@ -62,7 +64,7 @@ export const useMeals = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD
+  const today = getBrazilianDateString() // Data atual no fuso horário brasileiro
 
   // Função para calcular totais de macronutrientes
   const calculateMealTotals = (meals: Meal[]): MacroTotals => {
