@@ -132,8 +132,14 @@ export function useFoods() {
 
     try {
       const now = new Date().toISOString()
+      
+      // Remove campos undefined para evitar erro no Firestore
+      const cleanedData = Object.fromEntries(
+        Object.entries(foodData).filter(([_, value]) => value !== undefined)
+      ) as Omit<Food, 'id' | 'createdAt' | 'updatedAt'>
+      
       const newFood = {
-        ...foodData,
+        ...cleanedData,
         userId: user.id,
         isCustom: true,
         createdAt: now,
@@ -141,7 +147,7 @@ export function useFoods() {
       }
 
       const docRef = await addDoc(collection(db, 'foods'), newFood)
-      const createdFood = { id: docRef.id, ...newFood }
+      const createdFood: Food = { id: docRef.id, ...newFood }
       
       setFoods(prev => [...prev, createdFood])
       return createdFood

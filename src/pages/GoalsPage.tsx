@@ -41,26 +41,23 @@ export default function GoalsPage() {
   
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showAdvanced, setShowAdvanced] = useState(false)
+  const [dataLoaded, setDataLoaded] = useState(false)
 
-  // Carregar dados atuais do perfil
+  // Carregar dados atuais do perfil apenas uma vez
   useEffect(() => {
-    if (dailyGoal && macroGoals) {
-      setFormData({
+    if (!dataLoaded && dailyGoal && macroGoals) {
+      setFormData(prev => ({
+        ...prev,
         dailyGoal: dailyGoal,
         macroGoals: {
           protein: macroGoals.protein,
           carbs: macroGoals.carbs,
           fat: macroGoals.fat
-        },
-        microGoals: {
-          fiber: 25, // Valores padrão, pois não estão no perfil atual
-          sugar: 50,
-          sodium: 2300
-        },
-        hydrationGoal: 2000 // Valor padrão
-      })
+        }
+      }))
+      setDataLoaded(true)
     }
-  }, [dailyGoal, macroGoals])
+  }, [dailyGoal, macroGoals, dataLoaded])
 
   const handleInputChange = (category: keyof GoalFormData, field: string, value: number) => {
     if (category === 'dailyGoal' || category === 'hydrationGoal') {

@@ -20,25 +20,13 @@ const FOOD_CATEGORIES = {
   others: 'Outros'
 } as const
 
-// Unidades padrão para diferentes tipos de alimentos
-const DEFAULT_UNITS = {
-  solid: [
-    { name: 'grama', abbreviation: 'g', gramsEquivalent: 1 },
-    { name: 'quilograma', abbreviation: 'kg', gramsEquivalent: 1000 },
-    { name: 'unidade', abbreviation: 'unid', gramsEquivalent: 100 }, // valor padrão, pode ser editado
-  ],
-  liquid: [
-    { name: 'mililitro', abbreviation: 'ml', gramsEquivalent: 1 },
-    { name: 'litro', abbreviation: 'l', gramsEquivalent: 1000 },
-    { name: 'copo (200ml)', abbreviation: 'copo', gramsEquivalent: 200 },
-  ],
-  custom: [
-    { name: 'colher de sopa', abbreviation: 'c.sopa', gramsEquivalent: 15 },
-    { name: 'colher de chá', abbreviation: 'c.chá', gramsEquivalent: 5 },
-    { name: 'xícara', abbreviation: 'xíc', gramsEquivalent: 240 },
-    { name: 'fatia', abbreviation: 'fatia', gramsEquivalent: 25 },
-  ]
-}
+// Unidades disponíveis para seleção
+const AVAILABLE_UNITS = [
+  { name: 'grama', abbreviation: 'g', gramsEquivalent: 1 },
+  { name: 'mililitro', abbreviation: 'ml', gramsEquivalent: 1 },
+  { name: 'fatia', abbreviation: 'fatia', gramsEquivalent: 25 },
+  { name: 'unidade', abbreviation: 'unid', gramsEquivalent: 100 }
+]
 
 const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
   isOpen,
@@ -66,7 +54,8 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
   })
   
   const [selectedUnits, setSelectedUnits] = useState<Array<{name: string, abbreviation: string, gramsEquivalent: number}>>([
-    { name: 'grama', abbreviation: 'g', gramsEquivalent: 1 }
+    { name: 'grama', abbreviation: 'g', gramsEquivalent: 1 },
+    { name: 'unidade', abbreviation: 'unid', gramsEquivalent: 100 }
   ])
   
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -105,7 +94,8 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
 
   // Remover unidade
   const removeUnit = (abbreviation: string) => {
-    if (abbreviation === 'g' || abbreviation === 'ml') return // Não pode remover unidade base
+    // Sempre manter pelo menos uma unidade disponível
+    if (selectedUnits.length <= 1) return
     setSelectedUnits(prev => prev.filter(u => u.abbreviation !== abbreviation))
   }
 
@@ -133,7 +123,6 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
     try {
       const newFood: Omit<Food, 'id' | 'createdAt' | 'updatedAt'> = {
         name: formData.name.trim(),
-        brand: formData.brand.trim() || undefined,
         category: formData.category,
         nutrition: formData.nutrition,
         baseUnit: formData.baseUnit,
@@ -141,6 +130,11 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
         defaultUnit: selectedUnits[0]?.abbreviation || 'g',
         isCustom: true,
         isPublic: formData.isPublic
+      }
+
+      // Adicionar brand apenas se não estiver vazio
+      if (formData.brand.trim()) {
+        (newFood as any).brand = formData.brand.trim()
       }
 
       await addCustomFood(newFood)
@@ -163,7 +157,10 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
           water: 0
         }
       })
-      setSelectedUnits([{ name: 'grama', abbreviation: 'g', gramsEquivalent: 1 }])
+      setSelectedUnits([
+        { name: 'grama', abbreviation: 'g', gramsEquivalent: 1 },
+        { name: 'unidade', abbreviation: 'unid', gramsEquivalent: 100 }
+      ])
       
       onClose()
     } catch (error) {
@@ -224,13 +221,15 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
                   </select>
                 </div>
                 <div className={styles.field}>
-                  <label>Unidade Base</label>
+                  <label>Unidade Base para Valores Nutricionais</label>
                   <select
                     value={formData.baseUnit}
                     onChange={(e) => handleInputChange('baseUnit', e.target.value)}
                   >
-                    <option value="g">Gramas (sólido)</option>
-                    <option value="ml">Mililitros (líquido)</option>
+                    <option value="g">Por 100 gramas</option>
+                    <option value="ml">Por 100 mililitros</option>
+                    <option value="unid">Por unidade</option>
+                    <option value="fatia">Por fatia</option>
                   </select>
                 </div>
               </div>
@@ -238,7 +237,13 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
 
             {/* Informações Nutricionais */}
             <div className={styles.section}>
-              <h3>Informações Nutricionais (por 100{formData.baseUnit})</h3>
+              <h3>Informações Nutricionais (por {
+                formData.baseUnit === 'g' ? '100g' :
+                formData.baseUnit === 'ml' ? '100ml' :
+                formData.baseUnit === 'unid' ? 'unidade' :
+                formData.baseUnit === 'fatia' ? 'fatia' :
+                '100' + formData.baseUnit
+              })</h3>
               <div className={styles.nutritionGrid}>
                 <div className={styles.field}>
                   <label>Calorias (kcal)</label>
@@ -333,8 +338,8 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
                   <div className={styles.unitsList}>
                     {selectedUnits.map(unit => (
                       <div key={unit.abbreviation} className={styles.unitItem}>
-                        <span>{unit.name} ({unit.abbreviation}) = {unit.gramsEquivalent}{formData.baseUnit}</span>
-                        {unit.abbreviation !== 'g' && unit.abbreviation !== 'ml' && (
+                        <span>{unit.name} ({unit.abbreviation}) = {unit.gramsEquivalent}g</span>
+                        {selectedUnits.length > 1 && (
                           <button type="button" onClick={() => removeUnit(unit.abbreviation)}>×</button>
                         )}
                       </div>
@@ -343,20 +348,9 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
                 </div>
 
                 <div className={styles.addUnits}>
-                  <h4>Adicionar Unidades:</h4>
+                  <h4>Selecionar Unidades:</h4>
                   <div className={styles.unitButtons}>
-                    {(formData.baseUnit === 'g' ? DEFAULT_UNITS.solid : DEFAULT_UNITS.liquid).map(unit => (
-                      <button
-                        key={unit.abbreviation}
-                        type="button"
-                        onClick={() => addUnit(unit)}
-                        disabled={selectedUnits.some(u => u.abbreviation === unit.abbreviation)}
-                        className={styles.unitButton}
-                      >
-                        {unit.name}
-                      </button>
-                    ))}
-                    {DEFAULT_UNITS.custom.map(unit => (
+                    {AVAILABLE_UNITS.map(unit => (
                       <button
                         key={unit.abbreviation}
                         type="button"
