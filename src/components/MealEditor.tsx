@@ -6,7 +6,7 @@ import styles from './MealEditor.module.css'
 interface MealEditorProps {
   isOpen: boolean
   onClose: () => void
-  mealType?: 'breakfast' | 'lunch' | 'dinner' | 'snack'
+  mealType?: 'breakfast' | 'morning_snack' | 'lunch' | 'afternoon_snack' | 'dinner' | 'evening_snack'
   existingMeal?: Meal | null
 }
 
@@ -43,14 +43,16 @@ const MealEditor: React.FC<MealEditorProps> = ({
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<keyof typeof FOOD_CATEGORIES | 'all'>('all')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [currentMealType, setCurrentMealType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>(mealType)
+  const [currentMealType, setCurrentMealType] = useState<'breakfast' | 'morning_snack' | 'lunch' | 'afternoon_snack' | 'dinner' | 'evening_snack'>(mealType)
 
   // Nomes dos tipos de refeição
   const mealTypeNames = {
     breakfast: 'Café da Manhã',
+    morning_snack: 'Lanche da Manhã',
     lunch: 'Almoço',
+    afternoon_snack: 'Lanche da Tarde',
     dinner: 'Jantar',
-    snack: 'Lanche'
+    evening_snack: 'Ceia'
   }
 
   // Filtrar ingredientes por busca e categoria
@@ -225,7 +227,7 @@ const MealEditor: React.FC<MealEditorProps> = ({
               <select
                 id="mealType"
                 value={currentMealType}
-                onChange={(e) => setCurrentMealType(e.target.value as 'breakfast' | 'lunch' | 'dinner' | 'snack')}
+                onChange={(e) => setCurrentMealType(e.target.value as 'breakfast' | 'morning_snack' | 'lunch' | 'afternoon_snack' | 'dinner' | 'evening_snack')}
                 className={styles.mealTypeSelect}
               >
                 {Object.entries(mealTypeNames).map(([type, name]) => (

@@ -93,6 +93,19 @@
   transform: translateY(-1px);
 }
 
+.icon-btn.goals-btn {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  border-color: #3b82f6;
+}
+
+.icon-btn.goals-btn:hover {
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+  border-color: #1d4ed8;
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+  transform: translateY(-1px);
+}
+
 .icon-btn.logout:hover {
   background: #fecaca;
   border-color: #fca5a5;
@@ -111,9 +124,10 @@
 .dashboard-grid {
   display: grid;
   grid-template-columns: 300px 1fr 350px;
-  grid-template-rows: auto auto;
+  grid-template-rows: auto 1fr;
   gap: 1rem;
-  height: 100%;
+  height: calc(100vh - 120px); /* Subtrair altura do header */
+  min-height: 600px; /* Altura mínima para telas pequenas */
 }
 
 /* Progress Section */
@@ -227,6 +241,9 @@
   border: 1px solid #e2e8f0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* Importante para flexbox funcionar corretamente */
 }
 
 .meals-header {
@@ -299,9 +316,19 @@
   border-color: #fbbf24;
 }
 
+.meal-btn.morning-snack:hover {
+  background: #fef0e6;
+  border-color: #f97316;
+}
+
 .meal-btn.lunch:hover {
   background: #dbeafe;
   border-color: #3b82f6;
+}
+
+.meal-btn.afternoon-snack:hover {
+  background: #f3e8ff;
+  border-color: #a855f7;
 }
 
 .meal-btn.dinner:hover {
@@ -309,15 +336,16 @@
   border-color: #6366f1;
 }
 
-.meal-btn.snack:hover {
-  background: #f3e8ff;
-  border-color: #a855f7;
+.meal-btn.evening-snack:hover {
+  background: #ecfdf5;
+  border-color: #10b981;
 }
 
 .meals-list.compact {
-  max-height: 400px;
+  flex: 1; /* Ocupar todo espaço disponível */
   overflow-y: auto;
   padding: 0.5rem;
+  min-height: 0; /* Permitir que encolha se necessário */
 }
 
 .meal-card.compact {
@@ -495,6 +523,36 @@
   background: linear-gradient(135deg, #dbeafe, #bfdbfe);
 }
 
+.add-meal-btn.breakfast:hover {
+  border-color: #fbbf24;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+}
+
+.add-meal-btn.morning-snack:hover {
+  border-color: #f97316;
+  background: linear-gradient(135deg, #fed7aa, #fbbf24);
+}
+
+.add-meal-btn.lunch:hover {
+  border-color: #3b82f6;
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+}
+
+.add-meal-btn.afternoon-snack:hover {
+  border-color: #a855f7;
+  background: linear-gradient(135deg, #f3e8ff, #ddd6fe);
+}
+
+.add-meal-btn.dinner:hover {
+  border-color: #6366f1;
+  background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+}
+
+.add-meal-btn.evening-snack:hover {
+  border-color: #10b981;
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+}
+
 /* Botão Flutuante para Adicionar Refeição */
 .floating-add-container {
   position: fixed;
@@ -586,6 +644,36 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   border-color: #3b82f6;
   background: #f8fafc;
+}
+
+.fab-option.breakfast:hover {
+  border-color: #fbbf24;
+  background: #fef3c7;
+}
+
+.fab-option.morning-snack:hover {
+  border-color: #f97316;
+  background: #fed7aa;
+}
+
+.fab-option.lunch:hover {
+  border-color: #3b82f6;
+  background: #dbeafe;
+}
+
+.fab-option.afternoon-snack:hover {
+  border-color: #a855f7;
+  background: #f3e8ff;
+}
+
+.fab-option.dinner:hover {
+  border-color: #6366f1;
+  background: #e0e7ff;
+}
+
+.fab-option.evening-snack:hover {
+  border-color: #10b981;
+  background: #ecfdf5;
 }
 
 .fab-option span:first-child {

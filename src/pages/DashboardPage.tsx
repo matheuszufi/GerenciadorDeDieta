@@ -21,7 +21,7 @@ export default function DashboardPage() {
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false)
   const [isMealEditorOpen, setIsMealEditorOpen] = useState(false)
   const [editingMeal, setEditingMeal] = useState<Meal | null>(null)
-  const [selectedMealType, setSelectedMealType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>('breakfast')
+  const [selectedMealType, setSelectedMealType] = useState<'breakfast' | 'morning_snack' | 'lunch' | 'afternoon_snack' | 'dinner' | 'evening_snack'>('breakfast')
   const [showFabMenu, setShowFabMenu] = useState(false)
   const [isAddIngredientModalOpen, setIsAddIngredientModalOpen] = useState(false)
 
@@ -35,7 +35,7 @@ export default function DashboardPage() {
     }
   }
 
-  const openMealEditor = (type: 'breakfast' | 'lunch' | 'dinner' | 'snack', meal?: Meal) => {
+  const openMealEditor = (type: 'breakfast' | 'morning_snack' | 'lunch' | 'afternoon_snack' | 'dinner' | 'evening_snack', meal?: Meal) => {
     setEditingMeal(meal || null)
     setSelectedMealType(type)
     setIsMealEditorOpen(true)
@@ -55,6 +55,16 @@ export default function DashboardPage() {
         alert('Erro ao excluir refeição')
       }
     }
+  }
+
+  // Função para ordenar refeições na sequência desejada
+  const sortMealsByOrder = (meals: Meal[]) => {
+    const mealOrder = ['breakfast', 'morning_snack', 'lunch', 'afternoon_snack', 'dinner', 'evening_snack']
+    return [...meals].sort((a, b) => {
+      const orderA = mealOrder.indexOf(a.type)
+      const orderB = mealOrder.indexOf(b.type)
+      return orderA - orderB
+    })
   }
 
   // Estados de loading e perfil incompleto
@@ -158,6 +168,9 @@ export default function DashboardPage() {
             <button onClick={() => setIsAddIngredientModalOpen(true)} className="icon-btn ingredient-btn" title="Criar Ingrediente">
               🥗
             </button>
+            <button onClick={() => navigate('/goals')} className="icon-btn goals-btn" title="Editar Metas">
+              🎯
+            </button>
             <button onClick={() => setIsHistoryModalOpen(true)} className="icon-btn" title="Histórico">
               📊
             </button>
@@ -246,14 +259,16 @@ export default function DashboardPage() {
 
             <div className="meals-list compact">
               {dailyMeals && dailyMeals.meals.length > 0 ? (
-                dailyMeals.meals.map((meal) => (
+                sortMealsByOrder(dailyMeals.meals).map((meal) => (
                   <div key={meal.id} className="meal-card compact">
                     <div className="meal-header">
                       <span className="meal-icon">
                         {meal.type === 'breakfast' && '☀️'}
-                        {meal.type === 'lunch' && '🌅'}
+                        {meal.type === 'morning_snack' && '🥐'}
+                        {meal.type === 'lunch' && '�️'}
+                        {meal.type === 'afternoon_snack' && '🧁'}
                         {meal.type === 'dinner' && '🌙'}
-                        {meal.type === 'snack' && '🍪'}
+                        {meal.type === 'evening_snack' && '🥛'}
                       </span>
                       <div className="meal-info">
                         <h4>{meal.name}</h4>
@@ -302,16 +317,22 @@ export default function DashboardPage() {
                   <p>Nenhuma refeição registrada hoje</p>
                   <div className="empty-actions">
                     <button onClick={() => openMealEditor('breakfast')} className="add-meal-btn breakfast">
-                      ☀️ Café
+                      ☀️ Café da Manhã
+                    </button>
+                    <button onClick={() => openMealEditor('morning_snack')} className="add-meal-btn morning-snack">
+                      🥐 Lanche da Manhã
                     </button>
                     <button onClick={() => openMealEditor('lunch')} className="add-meal-btn lunch">
-                      🌅 Almoço
+                      �️ Almoço
+                    </button>
+                    <button onClick={() => openMealEditor('afternoon_snack')} className="add-meal-btn afternoon-snack">
+                      🧁 Lanche da Tarde
                     </button>
                     <button onClick={() => openMealEditor('dinner')} className="add-meal-btn dinner">
                       🌙 Jantar
                     </button>
-                    <button onClick={() => openMealEditor('snack')} className="add-meal-btn snack">
-                      🍪 Lanche
+                    <button onClick={() => openMealEditor('evening_snack')} className="add-meal-btn evening-snack">
+                      🥛 Ceia
                     </button>
                   </div>
                 </div>
@@ -353,19 +374,27 @@ export default function DashboardPage() {
           <div className="fab-menu">
             <button onClick={() => openMealEditor('breakfast')} className="fab-option breakfast">
               <span>☀️</span>
-              <span>Café</span>
+              <span>Café da Manhã</span>
+            </button>
+            <button onClick={() => openMealEditor('morning_snack')} className="fab-option morning-snack">
+              <span>🥐</span>
+              <span>Lanche da Manhã</span>
             </button>
             <button onClick={() => openMealEditor('lunch')} className="fab-option lunch">
-              <span>🌅</span>
+              <span>�️</span>
               <span>Almoço</span>
+            </button>
+            <button onClick={() => openMealEditor('afternoon_snack')} className="fab-option afternoon-snack">
+              <span>🧁</span>
+              <span>Lanche da Tarde</span>
             </button>
             <button onClick={() => openMealEditor('dinner')} className="fab-option dinner">
               <span>🌙</span>
               <span>Jantar</span>
             </button>
-            <button onClick={() => openMealEditor('snack')} className="fab-option snack">
-              <span>🍪</span>
-              <span>Lanche</span>
+            <button onClick={() => openMealEditor('evening_snack')} className="fab-option evening-snack">
+              <span>🥛</span>
+              <span>Ceia</span>
             </button>
           </div>
         )}

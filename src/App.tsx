@@ -10,6 +10,7 @@ import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import DashboardPage from './pages/DashboardPage'
 import ProfilePage from './pages/ProfilePage'
+import GoalsPage from './pages/GoalsPage'
 
 function App() {
   useEffect(() => {
@@ -41,6 +42,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <ProfilePage />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/goals" 
+            element={
+              <ProtectedRoute>
+                <GoalsPage />
               </ProtectedRoute>
             } 
           />

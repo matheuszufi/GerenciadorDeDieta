@@ -44,7 +44,7 @@ export interface MacroTotals {
 
 export interface Meal {
   id: string
-  type: 'breakfast' | 'lunch' | 'dinner' | 'snack'
+  type: 'breakfast' | 'morning_snack' | 'lunch' | 'afternoon_snack' | 'dinner' | 'evening_snack'
   name: string
   items: MealItem[]
   totals: MacroTotals
