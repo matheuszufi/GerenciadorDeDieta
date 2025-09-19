@@ -150,7 +150,7 @@ const MacroProgress: React.FC<MacroProgressProps> = ({
         <div className={styles.caloriesInfo}>
           <div className={styles.caloriesRemaining}>
             <span className={styles.remainingValue}>
-              {Math.max(0, calories.target - calories.consumed)}
+              {Math.max(0, calories.target - calories.consumed).toFixed(2)}
             </span>
             <span className={styles.remainingLabel}>kcal restantes</span>
           </div>

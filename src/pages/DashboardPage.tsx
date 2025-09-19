@@ -203,7 +203,7 @@ export default function DashboardPage() {
                   {Math.round(calculateProgress(dailyGoal || 2000))}% da meta
                 </div>
                 <div className="calories-remaining">
-                  {Math.max(0, (dailyGoal || 2000) - (dailyMeals?.dailyTotals.calories || 0))} restantes
+                  {Math.max(0, (dailyGoal || 2000) - (dailyMeals?.dailyTotals.calories || 0)).toFixed(2)} restantes
                 </div>
               </div>
             </div>

@@ -111,7 +111,7 @@ export const useNutritionStats = ({
       calories: {
         consumed: totalNutrition.calories,
         target: targets.calories,
-        remaining: Math.max(0, targets.calories - totalNutrition.calories),
+        remaining: parseFloat(Math.max(0, targets.calories - totalNutrition.calories).toFixed(2)),
         percentage: (totalNutrition.calories / targets.calories) * 100
       },
       fiber: {
