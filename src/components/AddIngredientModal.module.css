@@ -18,7 +18,8 @@
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   max-width: 800px;
   width: 100%;
-  max-height: 90vh;
+  max-height: 85vh;
+  min-height: 60vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -60,15 +61,19 @@
   display: flex;
   flex-direction: column;
   flex: 1;
+  min-height: 0;
 }
 
 .content {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  min-height: 0;
+  height: 100%;
 }
 
 .section {
@@ -210,6 +215,17 @@
   background: #f1f5f9;
 }
 
+.unitButtonActive {
+  background: #3b82f6 !important;
+  color: white !important;
+  border-color: #2563eb !important;
+}
+
+.unitButtonActive:hover {
+  background: #2563eb !important;
+  transform: none !important;
+}
+
 .addCustomButton {
   background: linear-gradient(135deg, #3b82f6, #1d4ed8);
   color: white;
@@ -305,6 +321,7 @@
   display: flex;
   justify-content: space-between;
   gap: 1rem;
+  flex-shrink: 0;
 }
 
 .cancelButton {
@@ -349,21 +366,21 @@
 
 /* Scrollbar customization */
 .content::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 .content::-webkit-scrollbar-track {
   background: #f1f5f9;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
 .content::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
+  background: #94a3b8;
+  border-radius: 4px;
 }
 
 .content::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #64748b;
 }
 
 /* Responsive Design */

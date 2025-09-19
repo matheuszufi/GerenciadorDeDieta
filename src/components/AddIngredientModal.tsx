@@ -20,14 +20,6 @@ const FOOD_CATEGORIES = {
   others: 'Outros'
 } as const
 
-// Unidades disponíveis para seleção
-const AVAILABLE_UNITS = [
-  { name: 'grama', abbreviation: 'g', gramsEquivalent: 1 },
-  { name: 'mililitro', abbreviation: 'ml', gramsEquivalent: 1 },
-  { name: 'fatia', abbreviation: 'fatia', gramsEquivalent: 25 },
-  { name: 'unidade', abbreviation: 'unid', gramsEquivalent: 100 }
-]
-
 const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
   isOpen,
   onClose
@@ -39,7 +31,8 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
     name: '',
     brand: '',
     category: 'others' as keyof typeof FOOD_CATEGORIES,
-    baseUnit: 'g' as 'g' | 'ml' | 'unid' | 'fatia' | 'porcao',
+    baseUnit: 'g' as 'g' | 'ml' | 'unid' | 'fatia',
+    unitWeight: 100, // peso em gramas para fatia/unidade
     isPublic: false,
     nutrition: {
       calories: 0,
@@ -53,18 +46,7 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
     }
   })
   
-  const [selectedUnits, setSelectedUnits] = useState<Array<{name: string, abbreviation: string, gramsEquivalent: number}>>([
-    { name: 'grama', abbreviation: 'g', gramsEquivalent: 1 },
-    { name: 'unidade', abbreviation: 'unid', gramsEquivalent: 100 }
-  ])
-  
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [showCustomUnit, setShowCustomUnit] = useState(false)
-  const [customUnit, setCustomUnit] = useState({
-    name: '',
-    abbreviation: '',
-    gramsEquivalent: 1
-  })
 
   // Atualizar dados do formulário
   const handleInputChange = (field: string, value: string | number | boolean) => {
@@ -85,31 +67,6 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
     }
   }
 
-  // Adicionar unidade padrão
-  const addUnit = (unit: {name: string, abbreviation: string, gramsEquivalent: number}) => {
-    if (!selectedUnits.find(u => u.abbreviation === unit.abbreviation)) {
-      setSelectedUnits(prev => [...prev, unit])
-    }
-  }
-
-  // Remover unidade
-  const removeUnit = (abbreviation: string) => {
-    // Sempre manter pelo menos uma unidade disponível
-    if (selectedUnits.length <= 1) return
-    setSelectedUnits(prev => prev.filter(u => u.abbreviation !== abbreviation))
-  }
-
-  // Adicionar unidade customizada
-  const addCustomUnit = () => {
-    if (customUnit.name && customUnit.abbreviation && customUnit.gramsEquivalent > 0) {
-      if (!selectedUnits.find(u => u.abbreviation === customUnit.abbreviation)) {
-        setSelectedUnits(prev => [...prev, customUnit])
-        setCustomUnit({ name: '', abbreviation: '', gramsEquivalent: 1 })
-        setShowCustomUnit(false)
-      }
-    }
-  }
-
   // Salvar ingrediente
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -121,15 +78,24 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
 
     setIsSubmitting(true)
     try {
+      // Criar a unidade baseada na escolha do usuário
+      const unit = {
+        name: formData.baseUnit === 'g' ? 'grama' : 
+              formData.baseUnit === 'ml' ? 'mililitro' :
+              formData.baseUnit === 'fatia' ? 'fatia' : 'unidade',
+        abbreviation: formData.baseUnit,
+        gramsEquivalent: formData.baseUnit === 'g' || formData.baseUnit === 'ml' ? 100 : formData.unitWeight
+      }
+
       const newFood: Omit<Food, 'id' | 'createdAt' | 'updatedAt'> = {
         name: formData.name.trim(),
         category: formData.category,
         nutrition: formData.nutrition,
         baseUnit: formData.baseUnit,
-        availableUnits: selectedUnits,
-        defaultUnit: selectedUnits[0]?.abbreviation || 'g',
+        availableUnits: [unit],
+        defaultUnit: unit.abbreviation,
         isCustom: true,
-        isPublic: formData.isPublic
+        isPublic: false // Sempre false conforme solicitado
       }
 
       // Adicionar brand apenas se não estiver vazio
@@ -145,6 +111,7 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
         brand: '',
         category: 'others',
         baseUnit: 'g',
+        unitWeight: 100,
         isPublic: false,
         nutrition: {
           calories: 0,
@@ -157,10 +124,6 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
           water: 0
         }
       })
-      setSelectedUnits([
-        { name: 'grama', abbreviation: 'g', gramsEquivalent: 1 },
-        { name: 'unidade', abbreviation: 'unid', gramsEquivalent: 100 }
-      ])
       
       onClose()
     } catch (error) {
@@ -233,6 +196,29 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
                   </select>
                 </div>
               </div>
+
+              {/* Campo adicional para peso quando unidade for fatia ou unidade */}
+              {(formData.baseUnit === 'fatia' || formData.baseUnit === 'unid') && (
+                <div className={styles.row}>
+                  <div className={styles.field}>
+                    <label>
+                      Peso em gramas {formData.baseUnit === 'fatia' ? 'da fatia' : 'da unidade'} *
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      step="0.1"
+                      value={formData.unitWeight}
+                      onChange={(e) => handleInputChange('unitWeight', parseFloat(e.target.value) || 1)}
+                      placeholder={`Ex: ${formData.baseUnit === 'fatia' ? '25' : '50'}`}
+                      required
+                    />
+                    <small style={{ color: '#6b7280', fontSize: '0.75rem' }}>
+                      Informe quantas gramas tem uma {formData.baseUnit === 'fatia' ? 'fatia' : 'unidade'} deste ingrediente
+                    </small>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Informações Nutricionais */}
@@ -240,8 +226,8 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
               <h3>Informações Nutricionais (por {
                 formData.baseUnit === 'g' ? '100g' :
                 formData.baseUnit === 'ml' ? '100ml' :
-                formData.baseUnit === 'unid' ? 'unidade' :
-                formData.baseUnit === 'fatia' ? 'fatia' :
+                formData.baseUnit === 'unid' ? `unidade (${formData.unitWeight}g)` :
+                formData.baseUnit === 'fatia' ? `fatia (${formData.unitWeight}g)` :
                 '100' + formData.baseUnit
               })</h3>
               <div className={styles.nutritionGrid}>
@@ -326,90 +312,6 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
                     onChange={(e) => handleInputChange('nutrition.water', e.target.value)}
                   />
                 </div>
-              </div>
-            </div>
-
-            {/* Unidades de Medida */}
-            <div className={styles.section}>
-              <h3>Unidades de Medida</h3>
-              <div className={styles.unitsSection}>
-                <div className={styles.selectedUnits}>
-                  <h4>Unidades Selecionadas:</h4>
-                  <div className={styles.unitsList}>
-                    {selectedUnits.map(unit => (
-                      <div key={unit.abbreviation} className={styles.unitItem}>
-                        <span>{unit.name} ({unit.abbreviation}) = {unit.gramsEquivalent}g</span>
-                        {selectedUnits.length > 1 && (
-                          <button type="button" onClick={() => removeUnit(unit.abbreviation)}>×</button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className={styles.addUnits}>
-                  <h4>Selecionar Unidades:</h4>
-                  <div className={styles.unitButtons}>
-                    {AVAILABLE_UNITS.map(unit => (
-                      <button
-                        key={unit.abbreviation}
-                        type="button"
-                        onClick={() => addUnit(unit)}
-                        disabled={selectedUnits.some(u => u.abbreviation === unit.abbreviation)}
-                        className={styles.unitButton}
-                      >
-                        {unit.name}
-                      </button>
-                    ))}
-                  </div>
-
-                  {!showCustomUnit ? (
-                    <button
-                      type="button"
-                      onClick={() => setShowCustomUnit(true)}
-                      className={styles.addCustomButton}
-                    >
-                      + Unidade Personalizada
-                    </button>
-                  ) : (
-                    <div className={styles.customUnitForm}>
-                      <input
-                        type="text"
-                        placeholder="Nome da unidade"
-                        value={customUnit.name}
-                        onChange={(e) => setCustomUnit(prev => ({...prev, name: e.target.value}))}
-                      />
-                      <input
-                        type="text"
-                        placeholder="Abreviação"
-                        value={customUnit.abbreviation}
-                        onChange={(e) => setCustomUnit(prev => ({...prev, abbreviation: e.target.value}))}
-                      />
-                      <input
-                        type="number"
-                        placeholder="Equivalente em gramas"
-                        value={customUnit.gramsEquivalent}
-                        onChange={(e) => setCustomUnit(prev => ({...prev, gramsEquivalent: parseFloat(e.target.value) || 1}))}
-                      />
-                      <button type="button" onClick={addCustomUnit}>Adicionar</button>
-                      <button type="button" onClick={() => setShowCustomUnit(false)}>Cancelar</button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Configurações */}
-            <div className={styles.section}>
-              <div className={styles.checkboxField}>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={formData.isPublic}
-                    onChange={(e) => handleInputChange('isPublic', e.target.checked)}
-                  />
-                  Tornar público (outros usuários poderão usar este ingrediente)
-                </label>
               </div>
             </div>
           </div>
