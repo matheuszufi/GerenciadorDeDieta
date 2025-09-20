@@ -315,6 +315,17 @@
 }
 
 /* Responsive Design */
+@media (max-width: 1024px) {
+  .container {
+    padding: 1.25rem;
+  }
+  
+  .macrosGrid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.25rem;
+  }
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
@@ -325,30 +336,161 @@
     flex-direction: column;
     text-align: center;
     gap: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+  
+  .remainingValue {
+    font-size: 2rem;
+  }
+  
+  .caloriesStats {
+    gap: 1.5rem;
   }
   
   .macrosGrid {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .microMacrosGrid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
   }
   
   .compactContainer {
     flex-direction: column;
     align-items: stretch;
+    gap: 1rem;
+    padding: 0.75rem;
   }
   
   .caloriesCompact {
     align-self: center;
   }
+  
+  .macrosCompact {
+    gap: 0.75rem;
+  }
+  
+  .macroCompactItem {
+    gap: 0.5rem;
+  }
+  
+  .macroCompactInfo {
+    min-width: 80px;
+  }
+  
+  .macroCompactLabel {
+    font-size: 0.75rem;
+  }
+  
+  .macroCompactValue {
+    font-size: 0.8rem;
+  }
+  
+  .macroPercentage {
+    font-size: 0.75rem;
+    min-width: 40px;
+  }
 }
 
 @media (max-width: 480px) {
+  .container {
+    padding: 0.75rem;
+    gap: 1rem;
+  }
+  
+  .caloriesSection {
+    gap: 1rem;
+    padding-bottom: 1rem;
+  }
+  
+  .remainingValue {
+    font-size: 1.75rem;
+  }
+  
   .caloriesStats {
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.75rem;
+  }
+  
+  .statValue {
+    font-size: 1.125rem;
   }
   
   .macroCard {
     padding: 1rem;
+  }
+  
+  .macroCaloriesValue {
+    font-size: 1.25rem;
+  }
+  
+  .compactContainer {
+    padding: 0.5rem;
+    gap: 0.75rem;
+  }
+  
+  .macroCompactItem {
+    flex-wrap: wrap;
+    gap: 0.375rem;
+  }
+  
+  .macroCompactInfo {
+    min-width: 70px;
+    flex: 1;
+  }
+  
+  .macroCompactBar {
+    flex: 1;
+    min-width: 60px;
+    order: 3;
+    width: 100%;
+  }
+  
+  .macroPercentage {
+    min-width: 35px;
+    order: 2;
+  }
+  
+  .microMacroCard {
+    padding: 0.75rem;
+  }
+  
+  .microMacroCompactItem {
+    gap: 0.5rem;
+  }
+}
+
+/* Melhorias específicas para layout em dispositivos muito pequenos */
+@media (max-width: 360px) {
+  .container {
+    padding: 0.5rem;
+  }
+  
+  .remainingValue {
+    font-size: 1.5rem;
+  }
+  
+  .macroCard {
+    padding: 0.75rem;
+  }
+  
+  .compactContainer {
+    padding: 0.375rem;
+  }
+  
+  .macroCompactLabel {
+    font-size: 0.7rem;
+  }
+  
+  .macroCompactValue {
+    font-size: 0.75rem;
+  }
+  
+  .macroPercentage {
+    font-size: 0.7rem;
+    min-width: 30px;
   }
 }
 

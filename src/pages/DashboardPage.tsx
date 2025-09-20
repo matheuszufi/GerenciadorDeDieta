@@ -305,8 +305,10 @@ export default function DashboardPage() {
                       {meal.items.map((item, index) => (
                         <div key={item.id || index} className="meal-item">
                           <span className="item-name">{item.foodName}</span>
-                          <span className="item-quantity">{item.quantity}g</span>
-                          <span className="item-calories">{Math.round(item.calories)}kcal</span>
+                          <div className="item-details">
+                            <span className="item-quantity">{item.quantity}g</span>
+                            <span className="item-calories">{Math.round(item.calories)}kcal</span>
+                          </div>
                         </div>
                       ))}
                     </div>
