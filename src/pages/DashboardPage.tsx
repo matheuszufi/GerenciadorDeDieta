@@ -165,20 +165,13 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="header-actions">
-            <button onClick={() => setIsAddIngredientModalOpen(true)} className="icon-btn ingredient-btn" title="Criar Ingrediente">
-              🥗
+            <button onClick={() => navigate('/profile')} className="header-btn profile" title="Perfil">
+              <span className="btn-icon">👤</span>
+              <span className="btn-text">Perfil</span>
             </button>
-            <button onClick={() => navigate('/goals')} className="icon-btn goals-btn" title="Editar Metas">
-              🎯
-            </button>
-            <button onClick={() => setIsHistoryModalOpen(true)} className="icon-btn" title="Histórico">
-              📊
-            </button>
-            <button onClick={() => navigate('/profile')} className="icon-btn" title="Perfil">
-              👤
-            </button>
-            <button onClick={handleLogout} className="icon-btn logout" title="Sair">
-              🚪
+            <button onClick={handleLogout} className="header-btn logout" title="Sair">
+              <span className="btn-icon">�</span>
+              <span className="btn-text">Sair</span>
             </button>
           </div>
         </div>
@@ -221,6 +214,45 @@ export default function DashboardPage() {
               <div className="meta-item">
                 <span className="meta-label">Meta</span>
                 <span className="meta-value">{dailyGoal}</span>
+              </div>
+            </div>
+
+            {/* Ações Rápidas */}
+            <div className="quick-actions">
+              <h4>Ações Rápidas</h4>
+              <div className="action-buttons">
+                <button 
+                  onClick={() => setIsAddIngredientModalOpen(true)} 
+                  className="action-btn create-ingredient"
+                  title="Criar Ingrediente"
+                >
+                  <span className="action-icon">🥗</span>
+                  <span className="action-text">Criar Ingrediente</span>
+                </button>
+                <button 
+                  onClick={() => navigate('/foods')} 
+                  className="action-btn manage-foods"
+                  title="Gerenciar Alimentos"
+                >
+                  <span className="action-icon">🍎</span>
+                  <span className="action-text">Gerenciar Alimentos</span>
+                </button>
+                <button 
+                  onClick={() => navigate('/goals')} 
+                  className="action-btn edit-goals"
+                  title="Editar Metas"
+                >
+                  <span className="action-icon">🎯</span>
+                  <span className="action-text">Editar Metas</span>
+                </button>
+                <button 
+                  onClick={() => setIsHistoryModalOpen(true)} 
+                  className="action-btn history"
+                  title="Histórico"
+                >
+                  <span className="action-icon">📊</span>
+                  <span className="action-text">Histórico</span>
+                </button>
               </div>
             </div>
           </section>

@@ -26,79 +26,8 @@ interface AddMealProps {
   onClose: () => void;
 }
 
-// Base de dados simplificada de alimentos
-const FOOD_DATABASE: FoodItem[] = [
-  {
-    id: '1',
-    name: 'Arroz Branco Cozido',
-    nutrition: { calories: 130, protein: 2.7, carbs: 28, fat: 0.3, fiber: 0.4 }
-  },
-  {
-    id: '2',
-    name: 'Feijão Preto Cozido',
-    nutrition: { calories: 132, protein: 8.9, carbs: 23, fat: 0.5, fiber: 8.7 }
-  },
-  {
-    id: '3',
-    name: 'Peito de Frango Grelhado',
-    nutrition: { calories: 165, protein: 31, carbs: 0, fat: 3.6, fiber: 0 }
-  },
-  {
-    id: '4',
-    name: 'Ovo Cozido',
-    nutrition: { calories: 155, protein: 13, carbs: 1.1, fat: 11, fiber: 0 }
-  },
-  {
-    id: '5',
-    name: 'Banana',
-    nutrition: { calories: 89, protein: 1.1, carbs: 23, fat: 0.3, fiber: 2.6 }
-  },
-  {
-    id: '6',
-    name: 'Aveia em Flocos',
-    nutrition: { calories: 389, protein: 17, carbs: 66, fat: 7, fiber: 10 }
-  },
-  {
-    id: '7',
-    name: 'Leite Integral',
-    nutrition: { calories: 61, protein: 3.2, carbs: 4.5, fat: 3.2, fiber: 0 }
-  },
-  {
-    id: '8',
-    name: 'Pão Francês',
-    nutrition: { calories: 300, protein: 9, carbs: 58, fat: 3.1, fiber: 2.3 }
-  },
-  {
-    id: '9',
-    name: 'Maçã',
-    nutrition: { calories: 52, protein: 0.3, carbs: 14, fat: 0.2, fiber: 2.4 }
-  },
-  {
-    id: '10',
-    name: 'Batata Doce Cozida',
-    nutrition: { calories: 86, protein: 1.6, carbs: 20, fat: 0.1, fiber: 3 }
-  },
-  {
-    id: '11',
-    name: 'Água',
-    nutrition: { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, water: 100 }
-  },
-  {
-    id: '12',
-    name: 'Suco de Laranja',
-    nutrition: { calories: 45, protein: 0.7, carbs: 10.4, fat: 0.2, fiber: 0.2, water: 88 }
-  },
-  {
-    id: '13',
-    name: 'Leite Desnatado',
-    nutrition: { calories: 34, protein: 3.4, carbs: 5, fat: 0.1, fiber: 0, water: 90 }
-  },
-  {
-    id: '14',
-    name: 'Café sem Açúcar',
-    nutrition: { calories: 2, protein: 0.3, carbs: 0, fat: 0, fiber: 0, water: 99 }
-  }
-];
+// Base de dados de alimentos - agora vazio, usuário deve criar seus próprios alimentos
+const FOOD_DATABASE: FoodItem[] = [];
 
 const AddMeal: React.FC<AddMealProps> = ({ onAddMeal, onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');

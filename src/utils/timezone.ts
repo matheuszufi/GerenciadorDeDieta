@@ -6,15 +6,19 @@ export const BRAZIL_TIMEZONE = 'America/Sao_Paulo'
  * Get current date in Brazilian timezone
  */
 export const getBrazilianDate = (): Date => {
-  return new Date(new Date().toLocaleString("en-US", { timeZone: BRAZIL_TIMEZONE }))
+  // Create a date object that represents the current moment in Brazilian timezone
+  const now = new Date()
+  const brazilTime = new Date(now.toLocaleString("en-US", { timeZone: BRAZIL_TIMEZONE }))
+  return brazilTime
 }
 
 /**
  * Get current date string in YYYY-MM-DD format for Brazilian timezone
  */
 export const getBrazilianDateString = (): string => {
-  const brazilDate = getBrazilianDate()
-  return brazilDate.toISOString().split('T')[0]
+  const now = new Date()
+  const formatter = new Intl.DateTimeFormat('en-CA', { timeZone: BRAZIL_TIMEZONE })
+  return formatter.format(now) // Returns YYYY-MM-DD format
 }
 
 /**
@@ -50,8 +54,8 @@ export const formatBrazilianDateTime = (date: Date | string): string => {
  */
 export const formatDateString = (date: Date | string): string => {
   const dateObj = typeof date === 'string' ? new Date(date) : date
-  const brazilDate = new Date(dateObj.toLocaleString("en-US", { timeZone: BRAZIL_TIMEZONE }))
-  return brazilDate.toISOString().split('T')[0]
+  const formatter = new Intl.DateTimeFormat('en-CA', { timeZone: BRAZIL_TIMEZONE })
+  return formatter.format(dateObj)
 }
 
 /**

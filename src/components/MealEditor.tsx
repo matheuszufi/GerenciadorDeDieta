@@ -70,10 +70,19 @@ const MealEditor: React.FC<MealEditorProps> = ({
     if (existingMeal && foods.length > 0) {
       const selections: FoodSelection[] = existingMeal.items.map(item => {
         const food = foods.find(f => f.id === item.foodId)
+        
+        // Se o item já tem uma unidade, usar ela. Senão, preferir gramas se disponível
+        let unit = item.unit
+        if (!unit && food) {
+          unit = food.availableUnits.find(u => u.abbreviation === 'g')?.abbreviation || 
+                 food.availableUnits.find(u => u.abbreviation === 'ml')?.abbreviation || 
+                 food.defaultUnit || 'g'
+        }
+        
         return {
           foodId: item.foodId,
           quantity: item.quantity,
-          unit: item.unit || food?.defaultUnit || 'g' // Usar a unidade do item ou a padrão do alimento
+          unit: unit || 'g'
         }
       })
       setSelectedFoods(selections)
@@ -87,6 +96,12 @@ const MealEditor: React.FC<MealEditorProps> = ({
   // Adicionar ingrediente à seleção
   const handleAddFood = (food: Food) => {
     const existingIndex = selectedFoods.findIndex(s => s.foodId === food.id)
+    
+    // Encontrar a melhor unidade padrão (preferir gramas)
+    const defaultUnit = food.availableUnits.find(u => u.abbreviation === 'g')?.abbreviation || 
+                       food.availableUnits.find(u => u.abbreviation === 'ml')?.abbreviation || 
+                       food.defaultUnit
+    
     if (existingIndex >= 0) {
       // Se já existe, aumentar a quantidade
       const newSelections = [...selectedFoods]
@@ -97,7 +112,7 @@ const MealEditor: React.FC<MealEditorProps> = ({
       setSelectedFoods(prev => [...prev, { 
         foodId: food.id, 
         quantity: 100, // 100g por padrão
-        unit: food.defaultUnit 
+        unit: defaultUnit // Usar gramas quando disponível
       }])
     }
   }
@@ -216,8 +231,8 @@ const MealEditor: React.FC<MealEditorProps> = ({
   const totals = calculateTotals()
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={e => e.stopPropagation()}>
+    <div className={styles.overlay}>
+      <div className={styles.modal}>
         <div className={styles.header}>
           <div className={styles.titleSection}>
             <h2>{existingMeal ? 'Editar' : 'Adicionar'} Refeição</h2>

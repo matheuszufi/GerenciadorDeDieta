@@ -1,0 +1,370 @@
+.foods-page {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+.foods-header {
+  margin-bottom: 2rem;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.foods-header h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.back-button {
+  background: #6b7280;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.back-button:hover {
+  background: #4b5563;
+  transform: translateY(-1px);
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.add-food-button {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.add-food-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+}
+
+.foods-filters {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  flex: 1;
+  min-width: 300px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.category-filter select {
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  background: white;
+  cursor: pointer;
+  min-width: 150px;
+}
+
+.foods-list {
+  margin-bottom: 2rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 4rem 2rem;
+  font-size: 1.125rem;
+  color: #6b7280;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.empty-state p {
+  font-size: 1.125rem;
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+}
+
+.add-first-food {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-first-food:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+}
+
+.foods-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.food-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.food-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.food-header {
+  margin-bottom: 1rem;
+}
+
+.food-header h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+}
+
+.food-brand {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.food-category {
+  display: inline-block;
+  background: #f3f4f6;
+  color: #374151;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.food-nutrition {
+  margin-bottom: 1rem;
+}
+
+.nutrition-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.nutrition-item .label {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.nutrition-item .value {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 0.875rem;
+}
+
+.food-unit {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  text-align: center;
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
+.food-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.edit-button,
+.delete-button {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+}
+
+.edit-button {
+  background: #3b82f6;
+  color: white;
+}
+
+.edit-button:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+.delete-button {
+  background: #ef4444;
+  color: white;
+}
+
+.delete-button:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .foods-page {
+    padding: 1rem;
+  }
+
+  .header-top {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .foods-filters {
+    flex-direction: column;
+  }
+
+  .search-box {
+    min-width: auto;
+  }
+
+  .foods-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .foods-header h1 {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .food-actions {
+    flex-direction: column;
+  }
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 1rem;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+}
+
+.close-button:hover {
+  color: #374151;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  padding: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.modal-footer button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+  background: #6b7280;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.modal-footer button:hover {
+  background: #4b5563;
+}

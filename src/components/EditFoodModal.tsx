@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useFoods, type Food } from '../hooks/useFoods'
-import styles from './AddIngredientModal.module.css'
+import styles from './EditFoodModal.module.css'
 
-interface AddIngredientModalProps {
+interface EditFoodModalProps {
+  food: Food
   isOpen: boolean
   onClose: () => void
 }
@@ -20,11 +21,12 @@ const FOOD_CATEGORIES = {
   others: 'Outros'
 } as const
 
-const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
+const EditFoodModal: React.FC<EditFoodModalProps> = ({
+  food,
   isOpen,
   onClose
 }) => {
-  const { addCustomFood } = useFoods()
+  const { updateCustomFood } = useFoods()
   
   // Estados do formulário
   const [formData, setFormData] = useState({
@@ -32,8 +34,7 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
     brand: '',
     category: 'others' as keyof typeof FOOD_CATEGORIES,
     baseUnit: 'g' as 'g' | 'ml' | 'unid' | 'fatia',
-    unitWeight: 100, // peso em gramas para fatia/unidade
-    isPublic: false,
+    unitWeight: 100,
     nutrition: {
       calories: 0,
       protein: 0,
@@ -47,6 +48,23 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
   })
   
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Carregar dados do alimento quando o modal abrir
+  useEffect(() => {
+    if (food && isOpen) {
+      setFormData({
+        name: food.name,
+        brand: food.brand || '',
+        category: food.category,
+        baseUnit: food.baseUnit === 'porcao' ? 'unid' : food.baseUnit,
+        unitWeight: food.availableUnits[0]?.gramsEquivalent || 100,
+        nutrition: { 
+          ...food.nutrition,
+          water: food.nutrition.water || 0
+        }
+      })
+    }
+  }, [food, isOpen])
 
   // Atualizar dados do formulário
   const handleInputChange = (field: string, value: string | number | boolean) => {
@@ -67,7 +85,7 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
     }
   }
 
-  // Salvar ingrediente
+  // Salvar alterações
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -78,6 +96,17 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
 
     setIsSubmitting(true)
     try {
+      // Validar dados obrigatórios
+      if (!formData.name.trim()) {
+        alert('Nome do ingrediente é obrigatório')
+        return
+      }
+
+      if ((formData.baseUnit === 'unid' || formData.baseUnit === 'fatia') && (!formData.unitWeight || formData.unitWeight <= 0)) {
+        alert('Peso da unidade é obrigatório e deve ser maior que zero')
+        return
+      }
+
       // Criar a unidade baseada na escolha do usuário
       const unit = {
         name: formData.baseUnit === 'g' ? 'grama' : 
@@ -86,68 +115,62 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
         abbreviation: formData.baseUnit,
         gramsEquivalent: formData.baseUnit === 'g' ? 1 : 
                         formData.baseUnit === 'ml' ? 1 : 
-                        formData.unitWeight
+                        (formData.unitWeight || 100)
       }
 
       // Normalizar os valores nutricionais para 100g quando baseUnit for 'unid' ou 'fatia'
       let nutritionValues = formData.nutrition
       if (formData.baseUnit === 'unid' || formData.baseUnit === 'fatia') {
         // Os valores inseridos são por unidade/fatia, precisamos converter para 100g
-        const factor = 100 / formData.unitWeight
+        const factor = 100 / (formData.unitWeight || 100)
         nutritionValues = {
-          calories: Math.round(formData.nutrition.calories * factor * 10) / 10,
-          protein: Math.round(formData.nutrition.protein * factor * 10) / 10,
-          carbs: Math.round(formData.nutrition.carbs * factor * 10) / 10,
-          fat: Math.round(formData.nutrition.fat * factor * 10) / 10,
-          fiber: Math.round(formData.nutrition.fiber * factor * 10) / 10,
-          sodium: Math.round(formData.nutrition.sodium * factor * 10) / 10,
-          sugar: Math.round(formData.nutrition.sugar * factor * 10) / 10,
+          calories: Math.round((formData.nutrition.calories || 0) * factor * 10) / 10,
+          protein: Math.round((formData.nutrition.protein || 0) * factor * 10) / 10,
+          carbs: Math.round((formData.nutrition.carbs || 0) * factor * 10) / 10,
+          fat: Math.round((formData.nutrition.fat || 0) * factor * 10) / 10,
+          fiber: Math.round((formData.nutrition.fiber || 0) * factor * 10) / 10,
+          sodium: Math.round((formData.nutrition.sodium || 0) * factor * 10) / 10,
+          sugar: Math.round((formData.nutrition.sugar || 0) * factor * 10) / 10,
           water: formData.nutrition.water ? Math.round(formData.nutrition.water * factor * 10) / 10 : 0
         }
       }
 
-      const newFood: Omit<Food, 'id' | 'createdAt' | 'updatedAt'> = {
+      // Garantir que todos os valores de nutrição são números válidos
+      const cleanNutrition = {
+        calories: Number(nutritionValues.calories) || 0,
+        protein: Number(nutritionValues.protein) || 0,
+        carbs: Number(nutritionValues.carbs) || 0,
+        fat: Number(nutritionValues.fat) || 0,
+        fiber: Number(nutritionValues.fiber) || 0,
+        sodium: Number(nutritionValues.sodium) || 0,
+        sugar: Number(nutritionValues.sugar) || 0,
+        water: Number(nutritionValues.water) || 0
+      }
+
+      const updates: Partial<Food> = {
         name: formData.name.trim(),
         category: formData.category,
-        nutrition: nutritionValues,
+        nutrition: cleanNutrition,
         baseUnit: formData.baseUnit,
         availableUnits: [unit],
         defaultUnit: unit.abbreviation,
-        isCustom: true,
-        isPublic: false // Sempre false conforme solicitado
       }
 
       // Adicionar brand apenas se não estiver vazio
       if (formData.brand.trim()) {
-        (newFood as any).brand = formData.brand.trim()
+        updates.brand = formData.brand.trim()
       }
 
-      await addCustomFood(newFood)
-      
-      // Reset form
-      setFormData({
-        name: '',
-        brand: '',
-        category: 'others',
-        baseUnit: 'g',
-        unitWeight: 100,
-        isPublic: false,
-        nutrition: {
-          calories: 0,
-          protein: 0,
-          carbs: 0,
-          fat: 0,
-          fiber: 0,
-          sodium: 0,
-          sugar: 0,
-          water: 0
-        }
-      })
-      
+      // Remover campos undefined para evitar erro no Firestore
+      const cleanUpdates = Object.fromEntries(
+        Object.entries(updates).filter(([_, value]) => value !== undefined)
+      ) as Partial<Food>
+
+      await updateCustomFood(food.id, cleanUpdates)
       onClose()
     } catch (error) {
-      console.error('Erro ao criar ingrediente:', error)
-      alert('Erro ao criar ingrediente')
+      console.error('Erro ao atualizar ingrediente:', error)
+      alert('Erro ao atualizar ingrediente')
     } finally {
       setIsSubmitting(false)
     }
@@ -159,7 +182,7 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
     <div className={styles.overlay}>
       <div className={styles.modal}>
         <div className={styles.header}>
-          <h2>Criar Novo Ingrediente</h2>
+          <h2>Editar Alimento</h2>
           <button className={styles.closeButton} onClick={onClose}>×</button>
         </div>
 
@@ -349,7 +372,7 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
               className={styles.saveButton}
               disabled={isSubmitting || !formData.name.trim()}
             >
-              {isSubmitting ? 'Salvando...' : 'Criar Ingrediente'}
+              {isSubmitting ? 'Salvando...' : 'Salvar Alterações'}
             </button>
           </div>
         </form>
@@ -358,4 +381,4 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
   )
 }
 
-export default AddIngredientModal
+export default EditFoodModal

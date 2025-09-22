@@ -37,7 +37,7 @@ const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null
 
   return (
-    <div className="history-modal-overlay" onClick={onClose}>
+    <div className="history-modal-overlay">
       <div className="history-modal" onClick={(e) => e.stopPropagation()}>
         <div className="history-modal-header">
           <h2>📊 Histórico de Metas</h2>

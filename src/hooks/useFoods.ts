@@ -69,21 +69,14 @@ export function useFoods() {
     }
   }
 
-  // Carregar alimentos (padrão + customizados do usuário)
+  // Carregar alimentos (apenas customizados do usuário)
   const loadFoods = async () => {
     if (!user) return
 
     try {
       setIsLoading(true)
       
-      // Buscar alimentos padrão (isCustom = false)
-      const defaultFoodsQuery = query(
-        collection(db, 'foods'), 
-        where('isCustom', '==', false)
-      )
-      const defaultFoodsSnapshot = await getDocs(defaultFoodsQuery)
-      
-      // Buscar alimentos customizados do usuário
+      // Buscar apenas alimentos customizados do usuário
       const userFoodsQuery = query(
         collection(db, 'foods'),
         where('userId', '==', user.id),
@@ -100,10 +93,6 @@ export function useFoods() {
       const publicFoodsSnapshot = await getDocs(publicFoodsQuery)
 
       const allFoods: Food[] = []
-      
-      defaultFoodsSnapshot.forEach(doc => {
-        allFoods.push({ id: doc.id, ...doc.data() } as Food)
-      })
       
       userFoodsSnapshot.forEach(doc => {
         allFoods.push({ id: doc.id, ...doc.data() } as Food)
@@ -163,8 +152,14 @@ export function useFoods() {
 
     try {
       const foodRef = doc(db, 'foods', foodId)
+      
+      // Remover campos undefined para evitar erro no Firestore
+      const cleanUpdates = Object.fromEntries(
+        Object.entries(updates).filter(([_, value]) => value !== undefined)
+      )
+      
       const updateData = {
-        ...updates,
+        ...cleanUpdates,
         updatedAt: new Date().toISOString()
       }
       
@@ -174,8 +169,12 @@ export function useFoods() {
         food.id === foodId ? { ...food, ...updateData } : food
       ))
     } catch (err) {
-      console.error('Erro ao atualizar alimento:', err)
-      throw new Error('Erro ao atualizar alimento')
+      console.error('Erro detalhado ao atualizar alimento:', err)
+      if (err instanceof Error) {
+        throw new Error(`Erro ao atualizar alimento: ${err.message}`)
+      } else {
+        throw new Error('Erro desconhecido ao atualizar alimento')
+      }
     }
   }
 
