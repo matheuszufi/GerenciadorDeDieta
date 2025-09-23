@@ -91,7 +91,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (firebaseEnabled && auth) {
         // Usar Firebase
         await signInWithEmailAndPassword(auth, email, password)
-        // O onAuthStateChanged irá atualizar o estado do usuário
+        // O onAuthStateChanged irá atualizar o estado do usuário, mas definir loading como false aqui também
+        setIsLoading(false)
       } else {
         // Modo mock
         await new Promise(resolve => setTimeout(resolve, 1000))
@@ -106,6 +107,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           }
           localStorage.setItem('mock_user_data', JSON.stringify(mockUser))
           setUser(mockUser)
+          setIsLoading(false)
         } else {
           throw new Error('Credenciais inválidas')
         }

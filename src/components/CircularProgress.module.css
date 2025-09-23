@@ -32,6 +32,9 @@
   }
 }
 
+
+
+
 .content {
   position: absolute;
   top: 50%;
@@ -111,12 +114,12 @@
 /* Hover effects */
 .container:hover .progressCircle {
   filter: drop-shadow(0 4px 8px rgba(16, 185, 129, 0.3));
-  transform: scale(1.02);
-  transform-origin: center;
+  transition: filter 0.3s ease, transform 0.3s ease;
 }
 
 .container:hover .svg {
-  transform: rotate(1deg);
+  transform: rotate(2deg);
+  transition: transform 0.3s ease;
 }
 
 /* Dark mode support */

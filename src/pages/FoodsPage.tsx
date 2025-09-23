@@ -147,57 +147,61 @@ const FoodsPage: React.FC = () => {
             </button>
           </div>
         ) : (
-          <div className="foods-grid">
-            {filteredFoods.map(food => (
-              <div key={food.id} className="food-card">
-                <div className="food-header">
-                  <h3>{food.name}</h3>
-                  {food.brand && <span className="food-brand">{food.brand}</span>}
-                </div>
-                
-                <div className="food-category">
-                  {categories.find(cat => cat.value === food.category)?.label}
-                </div>
-                
-                <div className="food-nutrition">
-                  <div className="nutrition-item">
-                    <span className="label">Calorias:</span>
-                    <span className="value">{food.nutrition.calories} kcal</span>
-                  </div>
-                  <div className="nutrition-item">
-                    <span className="label">Proteína:</span>
-                    <span className="value">{food.nutrition.protein}g</span>
-                  </div>
-                  <div className="nutrition-item">
-                    <span className="label">Carboidratos:</span>
-                    <span className="value">{food.nutrition.carbs}g</span>
-                  </div>
-                  <div className="nutrition-item">
-                    <span className="label">Gorduras:</span>
-                    <span className="value">{food.nutrition.fat}g</span>
-                  </div>
-                </div>
-                
-                <div className="food-unit">
-                  Por {food.availableUnits[0]?.gramsEquivalent || 100}{food.baseUnit}
-                </div>
-                
-                <div className="food-actions">
-                  <button 
-                    className="edit-button"
-                    onClick={() => setEditingFood(food)}
-                  >
-                    Editar
-                  </button>
-                  <button 
-                    className="delete-button"
-                    onClick={() => handleDeleteFood(food.id, food.name)}
-                  >
-                    Excluir
-                  </button>
-                </div>
-              </div>
-            ))}
+          <div className="foods-table-container">
+            <table className="foods-table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Categoria</th>
+                  <th>Calorias</th>
+                  <th>Proteína</th>
+                  <th>Carboidrato</th>
+                  <th>Gordura</th>
+                  <th>Fibra</th>
+                  <th>Unidade</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredFoods.map(food => (
+                  <tr key={food.id} className="food-row">
+                    <td className="food-name">
+                      <div>
+                        <strong>{food.name}</strong>
+                        {food.brand && <div className="food-brand">{food.brand}</div>}
+                      </div>
+                    </td>
+                    <td className="food-category">
+                      {categories.find(cat => cat.value === food.category)?.label}
+                    </td>
+                    <td className="nutrition-value">{food.nutrition.calories} kcal</td>
+                    <td className="nutrition-value">{food.nutrition.protein}g</td>
+                    <td className="nutrition-value">{food.nutrition.carbs}g</td>
+                    <td className="nutrition-value">{food.nutrition.fat}g</td>
+                    <td className="nutrition-value">{food.nutrition.fiber}g</td>
+                    <td className="food-unit">
+                      Por {food.availableUnits[0]?.gramsEquivalent || 100}{food.baseUnit}
+                    </td>
+                    <td className="food-actions">
+                      <button 
+                        className="edit-button"
+                        onClick={() => setEditingFood(food)}
+                        title="Editar alimento"
+                      >
+                        ✏️
+                      </button>
+                      <button 
+                        className="delete-button"
+                        onClick={() => handleDeleteFood(food.id, food.name)}
+                        title="Excluir alimento"
+                      >
+                        🗑️
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

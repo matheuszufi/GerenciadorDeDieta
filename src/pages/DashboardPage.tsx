@@ -24,6 +24,7 @@ export default function DashboardPage() {
   const [selectedMealType, setSelectedMealType] = useState<'breakfast' | 'morning_snack' | 'lunch' | 'afternoon_snack' | 'dinner' | 'evening_snack'>('breakfast')
   const [showFabMenu, setShowFabMenu] = useState(false)
   const [isAddIngredientModalOpen, setIsAddIngredientModalOpen] = useState(false)
+  const [mealEditorKey, setMealEditorKey] = useState(0) // Chave para forçar rerender do MealEditor
 
   // Handlers
   const handleLogout = async () => {
@@ -40,6 +41,17 @@ export default function DashboardPage() {
     setSelectedMealType(type)
     setIsMealEditorOpen(true)
     setShowFabMenu(false) // Fechar menu flutuante ao abrir editor
+  }
+
+  const closeMealEditor = () => {
+    setIsMealEditorOpen(false)
+    setEditingMeal(null)
+  }
+
+  const handleIngredientAdded = () => {
+    setIsAddIngredientModalOpen(false)
+    // Força o MealEditor a recarregar os alimentos atualizando sua key
+    setMealEditorKey(prev => prev + 1)
   }
 
   const toggleFabMenu = () => {
@@ -450,15 +462,16 @@ export default function DashboardPage() {
       />
       
       <MealEditor
+        key={mealEditorKey}
         isOpen={isMealEditorOpen}
-        onClose={() => setIsMealEditorOpen(false)}
+        onClose={closeMealEditor}
         mealType={selectedMealType}
         existingMeal={editingMeal}
       />
 
       <AddIngredientModal
         isOpen={isAddIngredientModalOpen}
-        onClose={() => setIsAddIngredientModalOpen(false)}
+        onClose={handleIngredientAdded}
       />
     </div>
   )
