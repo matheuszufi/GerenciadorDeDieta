@@ -161,3 +161,115 @@
     margin-bottom: 1.5rem;
   }
 }
+
+/* ============================================
+   ESTILOS ESPECÍFICOS PARA iOS (CAPACITOR)
+   ============================================ */
+
+/* Safe Area para iPhone X+ */
+:root {
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+}
+
+/* Configurações gerais para iOS */
+html.ios {
+  height: 100%;
+  overflow: hidden;
+}
+
+body.ios {
+  height: 100%;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  background-attachment: fixed;
+}
+
+/* Prevent bounce scroll no iOS */
+.ios-no-bounce {
+  overscroll-behavior-y: none;
+}
+
+/* Status bar spacing */
+.ios-status-bar-padding {
+  padding-top: var(--safe-area-inset-top);
+}
+
+/* Bottom safe area (iPhone X+) */
+.ios-safe-area-bottom {
+  padding-bottom: var(--safe-area-inset-bottom);
+}
+
+/* Teclado aberto no iOS */
+body.keyboard-open {
+  height: auto;
+}
+
+/* Scroll containers para iOS */
+.ios-scroll-container {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+}
+
+/* Botões com feedback tátil */
+.ios-button {
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s ease;
+}
+
+.ios-button:active {
+  opacity: 0.6;
+}
+
+/* Input focus para iOS */
+.ios input:focus,
+.ios textarea:focus {
+  outline: none;
+  -webkit-appearance: none;
+  box-shadow: 0 0 0 2px #10b981;
+}
+
+/* Prevent zoom no iOS */
+input[type="email"],
+input[type="number"],
+input[type="password"],
+input[type="search"],
+input[type="tel"],
+input[type="text"],
+input[type="url"],
+select,
+textarea {
+  font-size: 16px !important;
+}
+
+/* Cards com visual nativo iOS */
+.ios-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 0.5px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Modal overlay para iOS */
+.ios-modal-overlay {
+  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Transições suaves típicas do iOS */
+.ios-transition {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Scroll indicators para iOS */
+.ios-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.ios-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
